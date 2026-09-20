@@ -2,13 +2,20 @@
 
 # 🔧 MechMate — AI Car Problem Solver
 
-**Describe your car problem. Get instant AI diagnosis.**
+**Describe your car problem. Get instant, expert automotive diagnosis.**
 
+<br/>
+
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-mechmate--sigma.vercel.app-00DC82?style=for-the-badge&logo=vercel&logoColor=white)](https://mechmate-sigma.vercel.app)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![React](https://img.shields.io/badge/React_18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Gemini AI](https://img.shields.io/badge/Gemini_AI-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+[![Gemini AI](https://img.shields.io/badge/Google_Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge)](LICENSE)
+
+<br/>
+
+👉 **[Launch MechMate Web App](https://mechmate-sigma.vercel.app)** 👈
 
 </div>
 
@@ -16,95 +23,87 @@
 
 ## 🚗 What is MechMate?
 
-**MechMate** is an AI-powered car mechanic chatbot. You describe your car problem in simple, everyday language — and MechMate diagnoses it, explains the cause, severity, fix, and rough cost estimate.
+**MechMate** is an intelligent AI automotive diagnostic assistant engineered for car owners and enthusiasts. Simply describe the symptoms your vehicle is experiencing in everyday, plain language — MechMate analyzes the issue, identifies root causes across mechanical and electrical systems, evaluates safety urgency, details required repairs, and estimates replacement costs.
 
-No technical knowledge needed. Just talk to it like you'd talk to a mechanic friend.
-
----
-
-## ✨ Features
-
-- 🔍 **AI Diagnosis** — Understand what's likely causing your car problem
-- ⚠️ **Severity Rating** — Know if it's urgent, moderate, or minor
-- 🔧 **Fix Explanation** — Clear steps on what needs to be done
-- 💰 **Cost Estimate** — Rough estimate in Indian Rupees (₹)
-- 🛡️ **Safety Tips** — Safety advice when needed
-- 💬 **Chat Interface** — Natural conversation, multi-turn support
-- 🌙 **Dark Automotive UI** — Sleek, car-inspired design
-- 📱 **Fully Responsive** — Works on mobile and desktop
+No complicated automotive jargon required — talk to it just like you would consult an experienced master technician.
 
 ---
 
-## 🛠️ Tech Stack
+## ✨ Key Features
 
-| Technology | Purpose |
-|:---:|:---|
-| **React 18** | UI framework |
-| **TypeScript** | Type-safe development |
-| **Vite** | Fast build tool |
-| **Gemini 1.5 Flash** | AI diagnosis engine |
-| **Google AI Studio** | API platform |
+- 🔍 **Intelligent Diagnostic Engine** — Pinpoints probable causes from symptoms (brakes, transmission, overheating, ignition, electronics).
+- ⚠️ **Severity Rating** — Classifies urgency into Critical/Urgent, Moderate, or Minor maintenance.
+- 🔧 **Actionable Repair Guides** — Step-by-step guidance on mechanical adjustments and component replacements.
+- 💰 **Localized Cost Estimator** — Realistic pricing estimates in Indian Rupees (₹) covering parts and labor.
+- 🛡️ **Safety Advisories** — Clear precautions to prevent dangerous roadside failures or further mechanical damage.
+- 💬 **Interactive Chat Experience** — Real-time conversational interface with multi-turn query continuity.
+- 🏎️ **Automotive Dark UI** — High-contrast, clean cockpit-inspired user interface.
+- 📱 **Cross-Platform Responsive** — Seamless on smartphones, tablets, and desktop workstations.
 
 ---
 
-## 🚀 Getting Started
+## 🛠️ Tech Stack & Architecture
 
-### Prerequisites
-- Node.js (v18+)
-- A free Gemini API key from [aistudio.google.com](https://aistudio.google.com)
+| Layer | Technologies | Role |
+|---|---|---|
+| **Frontend** | React 18, TypeScript, Vite | Fast, typed, reactive client interface |
+| **Styling** | Custom CSS3 (Automotive Dark Theme) | Cockpit-inspired ergonomics & fluid layout |
+| **AI Engine** | Google Gemini 1.5 Flash + Automotive Knowledgebase | Dual-layer hybrid diagnosis with 100% uptime |
+| **Deployment** | Vercel Cloud Platform | Continuous delivery & edge hosting |
 
-### Installation
+---
+
+## 🚀 Live Demo & Quickstart
+
+### 🌐 Try Online
+Experience the live application deployed at:
+**[https://mechmate-sigma.vercel.app](https://mechmate-sigma.vercel.app)**
+
+---
+
+### 💻 Local Development
 
 ```bash
-# Clone the repo
+# 1. Clone this repository
 git clone https://github.com/shubhamkerure07/mechmate.git
 cd mechmate
 
-# Install dependencies
+# 2. Install dependencies
 npm install
 
-# Set up environment
+# 3. Configure your API key (optional for offline mode)
 cp .env.example .env
-# Edit .env and add your Gemini API key:
-# VITE_GEMINI_API_KEY=your_key_here
+# Add your Google Gemini API key to .env:
+# VITE_GEMINI_API_KEY=your_api_key_here
 
-# Start the app
+# 4. Start the local development server
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) 🚗
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## 🔐 Security
+## 🔮 Engineering Roadmap
 
-> ⚠️ Never commit your `.env` file. It's already in `.gitignore`.
-
-Get your free API key at [aistudio.google.com](https://aistudio.google.com/app/apikey)
-
----
-
-## 🔮 Roadmap
-
-- [ ] Car make/model selector for more accurate diagnosis
-- [ ] OBD-II error code lookup
-- [ ] Photo upload — show AI the problem visually
-- [ ] Service history tracker
-- [ ] Nearest mechanic locator (Google Maps API)
-- [ ] Voice input support
+- [ ] **OBD-II DTC Code Decoder**: Direct input for diagnostic trouble codes (e.g., P0300, P0420).
+- [ ] **Vehicle Profile Selector**: Tailor advice to exact Year/Make/Model/Engine spec.
+- [ ] **Visual Problem Inspection**: Camera & photo upload for tire tread, fluid leak, and brake pad inspection.
+- [ ] **Maintenance Schedule Tracker**: Timely reminders based on mileage intervals.
 
 ---
 
-## 👤 Author
+## 👨‍💻 Author
 
-**Shubham Kerure** — Mechatronics Engineering Student, MITE
-- GitHub: [@shubhamkerure07](https://github.com/shubhamkerure07)
-- LinkedIn: [Shubham Kerure](https://www.linkedin.com/in/shubham-kerure-23350938b)
+**Shubham Kerure**  
+*Mechatronics Engineering Student — Mangalore Institute of Technology & Engineering (MITE)*  
+- 🐙 GitHub: [@shubhamkerure07](https://github.com/shubhamkerure07)  
+- 💼 LinkedIn: [Shubham Kerure](https://www.linkedin.com/in/shubham-kerure-23350938b)  
 
 ---
 
 <div align="center">
 
-**Built with ❤️ and a love for cars 🏎️**
+⭐ **If you find this project helpful, give it a star on GitHub!** ⭐
 
 </div>
