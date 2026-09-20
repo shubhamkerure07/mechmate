@@ -1,19 +1,9 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
-
+// Supports both AI Studio OAuth tokens (AQ.) and Cloud API keys (AIza.)
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string
 
-if (!API_KEY || API_KEY === 'your_gemini_api_key_here') {
-  console.error('❌ No Gemini API key found in .env file!')
-}
-if (API_KEY?.startsWith('AQ.')) {
-  console.warn('⚠️ OAuth token detected. Use an API key from console.cloud.google.com/apis/credentials instead.')
-}
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
 
-const genAI = new GoogleGenerativeAI(API_KEY)
-
-const model = genAI.getGenerativeModel({
-  model: 'gemini-1.5-flash',
-  systemInstruction: `You are MechMate, an expert AI car mechanic assistant. 
+const SYSTEM_PROMPT = `You are MechMate, an expert AI car mechanic assistant. 
 You help car owners understand their vehicle problems in simple, clear language.
 
 When someone describes a car problem:
@@ -25,8 +15,7 @@ When someone describes a car problem:
 
 Keep your language simple and friendly — not overly technical. 
 Use emojis to make it easy to read.
-If the question is not related to cars/vehicles, politely redirect the user back to car problems.`,
-})
+If the question is not related to cars/vehicles, politely redirect the user back to car problems.`
 
 export interface ChatMessage {
   id: string
@@ -35,13 +24,59 @@ export interface ChatMessage {
   timestamp: Date
 }
 
-let chat = model.startChat({ history: [] })
+// Store conversation history for multi-turn chat
+let conversationHistory: { role: string; parts: { text: string }[] }[] = []
 
 export async function sendMessage(userMessage: string): Promise<string> {
-  const result = await chat.sendMessage(userMessage)
-  return result.response.text()
+  // Add user message to history
+  conversationHistory.push({
+    role: 'user',
+    parts: [{ text: userMessage }]
+  })
+
+  const requestBody = {
+    system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+    contents: conversationHistory
+  }
+
+  // Support both OAuth tokens (AQ.) and API keys (AIza.)
+  const isOAuthToken = API_KEY?.startsWith('AQ.')
+  
+  const url = isOAuthToken 
+    ? GEMINI_URL 
+    : `${GEMINI_URL}?key=${API_KEY}`
+
+  const fetchHeaders: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+
+  if (isOAuthToken) {
+    fetchHeaders['Authorization'] = `Bearer ${API_KEY}`
+  }
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: fetchHeaders,
+    body: JSON.stringify(requestBody)
+  })
+
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error?.error?.message || 'API request failed')
+  }
+
+  const data = await response.json()
+  const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, I could not get a response.'
+
+  // Add AI response to history
+  conversationHistory.push({
+    role: 'model',
+    parts: [{ text: aiText }]
+  })
+
+  return aiText
 }
 
 export function resetChat(): void {
-  chat = model.startChat({ history: [] })
+  conversationHistory = []
 }
