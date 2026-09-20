@@ -2,6 +2,13 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string
 
+if (!API_KEY || API_KEY === 'your_gemini_api_key_here') {
+  console.error('❌ No Gemini API key found in .env file!')
+}
+if (API_KEY?.startsWith('AQ.')) {
+  console.warn('⚠️ OAuth token detected. Use an API key from console.cloud.google.com/apis/credentials instead.')
+}
+
 const genAI = new GoogleGenerativeAI(API_KEY)
 
 const model = genAI.getGenerativeModel({
