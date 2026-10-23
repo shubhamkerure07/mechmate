@@ -3636,10 +3636,107 @@ html, body, #root {
   }
 }
 
+/* ==========================================================================
+   MULTI-DEVICE RESPONSIVENESS & MOBILE NATIVE EXPERIENCE
+   ========================================================================== */
+
+/* Prevent iOS Safari auto-zoom on input focus */
+input, select, textarea {
+  font-size: 16px !important;
+}
+
+/* Desktop only elements */
+@media (max-width: 767px) {
+  .desktop-only,
+  .desktop-nav {
+    display: none !important;
+  }
+}
+
+/* Mobile Bottom Navigation Bar (Active on Mobile Phones < 768px) */
+.mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .mobile-bottom-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(9, 10, 15, 0.94);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border-medium);
+    padding: 6px 4px max(6px, env(safe-area-inset-bottom));
+    z-index: 150;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.55);
+  }
+
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 4px 6px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    flex: 1;
+    min-height: 48px;
+    touch-action: manipulation;
+    transition: all 0.15s ease;
+  }
+
+  .mobile-nav-item svg {
+    opacity: 0.75;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+
+  .mobile-nav-item.active {
+    color: var(--brand-amber);
+  }
+
+  .mobile-nav-item.active svg {
+    color: var(--brand-amber);
+    opacity: 1;
+    transform: translateY(-1px);
+  }
+
+  /* Add bottom padding to shell and main layout so content is not obscured */
+  .app-shell {
+    padding-bottom: 74px;
+  }
+
+  .view-container,
+  .view-layout {
+    padding-bottom: 40px;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger {
+    min-height: 44px;
+  }
+
+  .preset-chip-btn {
+    min-height: 38px;
+    padding: 8px 14px;
+  }
+}
+
 @media (max-width: 600px) {
   .view-container,
   .view-layout {
-    padding: 24px 16px 60px;
+    padding: 20px 14px 40px;
   }
 
   .hero-title {
@@ -3653,6 +3750,8 @@ html, body, #root {
 
   .av-right {
     flex-wrap: wrap;
+    width: 100%;
+    justify-content: space-between;
   }
 
   .token-status-strip {
@@ -3675,3 +3774,105 @@ html, body, #root {
     text-align: center;
   }
 }
+
+@media (max-width: 480px) {
+  .header {
+    padding: 8px 14px;
+  }
+
+  .brand-name {
+    font-size: 0.95rem;
+  }
+
+  .brand-tagline,
+  .brand-badge {
+    display: none;
+  }
+
+  .hero-title {
+    font-size: 1.4rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.88rem;
+  }
+
+  .view-title {
+    font-size: 1.4rem;
+  }
+
+  .prompt-input-wrapper {
+    padding: 12px;
+  }
+
+  .prompt-textarea {
+    min-height: 80px;
+  }
+
+  .prompt-bottom-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .prompt-actions {
+    display: flex;
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .prompt-actions button {
+    flex: 1;
+  }
+
+  .telemetry-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .telemetry-card {
+    padding: 12px;
+  }
+
+  .telemetry-number {
+    font-size: 1.25rem;
+  }
+
+  .modal-card {
+    padding: 20px 14px;
+    border-radius: var(--radius-lg);
+    max-height: 92vh;
+  }
+
+  .modal-header h3 {
+    font-size: 1.05rem;
+  }
+
+  .cm-val {
+    font-size: 1.15rem;
+  }
+
+  .header-right-actions {
+    gap: 6px;
+  }
+
+  .header-token-badge {
+    padding: 4px 8px;
+  }
+
+  .token-label-tag {
+    display: none;
+  }
+
+  .header-user-btn {
+    padding: 4px 8px;
+  }
+
+  .user-btn-text {
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+

@@ -35,145 +35,193 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAuth
 }) => {
   return (
-    <header className="header">
-      <div className="header-container">
-        {/* Brand Logo & Name */}
-        <div className="header-brand-group">
-          <div
-            className="brand-logo-btn"
-            onClick={() => setActiveTab('diagnose')}
-            style={{ cursor: 'pointer' }}
-          >
-            <div className="brand-icon-wrapper">
-              <Wrench className="brand-wrench-icon" size={18} />
-            </div>
-            <div className="brand-text">
-              <div className="brand-title-row">
-                <span className="brand-name">MechMate</span>
-                <span className="brand-badge">INTELLIGENCE</span>
+    <>
+      <header className="header">
+        <div className="header-container">
+          {/* Brand Logo & Name */}
+          <div className="header-brand-group">
+            <div
+              className="brand-logo-btn"
+              onClick={() => setActiveTab('diagnose')}
+              style={{ cursor: 'pointer' }}
+            >
+              <div className="brand-icon-wrapper">
+                <Wrench className="brand-wrench-icon" size={18} />
               </div>
-              <span className="brand-tagline">Automotive Diagnostic Platform</span>
+              <div className="brand-text">
+                <div className="brand-title-row">
+                  <span className="brand-name">MechMate</span>
+                  <span className="brand-badge">INTELLIGENCE</span>
+                </div>
+                <span className="brand-tagline">Automotive Diagnostic Platform</span>
+              </div>
             </div>
+
+            {/* Active Vehicle Quick Selector (Hidden on small mobile, visible on desktop) */}
+            <button
+              className={`vehicle-selector-pill ${activeVehicle ? 'has-car' : 'generic'} desktop-only`}
+              onClick={() => setActiveTab('garage')}
+              title="Click to view garage or switch active vehicle"
+            >
+              <Car className="vehicle-pill-icon" size={15} />
+              <div className="vehicle-pill-info">
+                <span className="vehicle-pill-title">
+                  {activeVehicle
+                    ? `${activeVehicle.year} ${activeVehicle.make} ${activeVehicle.model}`
+                    : 'Generic Vehicle'}
+                </span>
+                <span className="vehicle-pill-meta">
+                  {activeVehicle
+                    ? `${activeVehicle.odometerKm.toLocaleString('en-IN')} km · ${activeVehicle.fuelType}`
+                    : 'Click to calibrate'}
+                </span>
+              </div>
+              <ChevronDown size={14} className="vehicle-pill-chevron" />
+            </button>
           </div>
 
-          {/* Active Vehicle Quick Selector */}
-          <button
-            className={`vehicle-selector-pill ${activeVehicle ? 'has-car' : 'generic'}`}
-            onClick={() => setActiveTab('garage')}
-            title="Click to view garage or switch active vehicle"
-          >
-            <Car className="vehicle-pill-icon" size={15} />
-            <div className="vehicle-pill-info">
-              <span className="vehicle-pill-title">
-                {activeVehicle
-                  ? `${activeVehicle.year} ${activeVehicle.make} ${activeVehicle.model}`
-                  : 'Generic Vehicle'}
+          {/* Desktop Center Navigation Tabs (Hidden on mobile <768px) */}
+          <nav className="header-nav desktop-nav" aria-label="Main Application Navigation">
+            <button
+              className={`nav-btn ${activeTab === 'diagnose' ? 'active' : ''}`}
+              onClick={() => setActiveTab('diagnose')}
+            >
+              <Activity size={15} />
+              <span>Diagnose</span>
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'evidence' ? 'active' : ''}`}
+              onClick={() => setActiveTab('evidence')}
+            >
+              <FileSearch size={15} />
+              <span>Evidence</span>
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'garage' ? 'active' : ''}`}
+              onClick={() => setActiveTab('garage')}
+            >
+              <Car size={15} />
+              <span>Garage</span>
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'maintenance' ? 'active' : ''}`}
+              onClick={() => setActiveTab('maintenance')}
+            >
+              <CalendarCheck size={15} />
+              <span>Service</span>
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'obd' ? 'active' : ''}`}
+              onClick={() => setActiveTab('obd')}
+            >
+              <Cpu size={15} />
+              <span>OBD-II</span>
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'settings' ? 'active' : ''}`}
+              onClick={() => setActiveTab('settings')}
+              title="Data Vault & System Architecture"
+            >
+              <Database size={15} />
+              <span>Vault</span>
+            </button>
+          </nav>
+
+          {/* Right Actions: Token Quota & Account */}
+          <div className="header-right-actions">
+            {/* Daily Token Quota Pill */}
+            <button
+              className="header-token-badge"
+              onClick={onOpenAuth}
+              title={`Daily Diagnostic Token Quota: ${tokenState.remainingTokens} of ${tokenState.maxTokens} remaining. Click to view account or upgrade.`}
+            >
+              <Zap size={13} className="token-bolt-icon" />
+              <span className="token-counter-text">
+                <strong>{tokenState.remainingTokens}</strong>/{tokenState.maxTokens}
               </span>
-              <span className="vehicle-pill-meta">
-                {activeVehicle
-                  ? `${activeVehicle.odometerKm.toLocaleString('en-IN')} km · ${activeVehicle.fuelType}`
-                  : 'Click to calibrate'}
+              <span className="token-label-tag">TOKENS</span>
+            </button>
+
+            {/* Customer Account Button */}
+            <button
+              className={`header-user-btn ${tokenState.tier === 'REGISTERED' ? 'signed-in' : ''}`}
+              onClick={onOpenAuth}
+              title={
+                tokenState.tier === 'REGISTERED'
+                  ? `Signed in as ${tokenState.user?.name} (${tokenState.user?.email})`
+                  : 'Sign in to unlock 25 tokens/day'
+              }
+            >
+              <User size={14} />
+              <span className="user-btn-text">
+                {tokenState.tier === 'REGISTERED'
+                  ? tokenState.user?.name || 'Account'
+                  : 'Sign In'}
               </span>
+            </button>
+
+            {/* Engine Status Badge (Desktop only on wide screens) */}
+            <div
+              className={`engine-status-badge desktop-only ${isServerAiOnline ? 'online' : 'fallback'}`}
+              title={
+                isServerAiOnline
+                  ? 'Server AI Active with Local Offline Fallback'
+                  : '100% Offline Mechatronic Engine Active (0 cost, instant evaluation)'
+              }
+            >
+              <span className="status-ping-dot" />
+              <Sparkles size={12} className="status-sparkle" />
+              <span>{isServerAiOnline ? 'Hybrid AI' : 'Offline Engine'}</span>
             </div>
-            <ChevronDown size={14} className="vehicle-pill-chevron" />
-          </button>
-        </div>
-
-        {/* Center Navigation Tabs */}
-        <nav className="header-nav" aria-label="Main Application Navigation">
-          <button
-            className={`nav-btn ${activeTab === 'diagnose' ? 'active' : ''}`}
-            onClick={() => setActiveTab('diagnose')}
-          >
-            <Activity size={15} />
-            <span>Diagnose</span>
-          </button>
-          <button
-            className={`nav-btn ${activeTab === 'evidence' ? 'active' : ''}`}
-            onClick={() => setActiveTab('evidence')}
-          >
-            <FileSearch size={15} />
-            <span>Evidence</span>
-          </button>
-          <button
-            className={`nav-btn ${activeTab === 'garage' ? 'active' : ''}`}
-            onClick={() => setActiveTab('garage')}
-          >
-            <Car size={15} />
-            <span>Garage</span>
-          </button>
-          <button
-            className={`nav-btn ${activeTab === 'maintenance' ? 'active' : ''}`}
-            onClick={() => setActiveTab('maintenance')}
-          >
-            <CalendarCheck size={15} />
-            <span>Service</span>
-          </button>
-          <button
-            className={`nav-btn ${activeTab === 'obd' ? 'active' : ''}`}
-            onClick={() => setActiveTab('obd')}
-          >
-            <Cpu size={15} />
-            <span>OBD-II</span>
-          </button>
-          <button
-            className={`nav-btn ${activeTab === 'settings' ? 'active' : ''}`}
-            onClick={() => setActiveTab('settings')}
-            title="Data Vault & System Architecture"
-          >
-            <Database size={15} />
-            <span>Vault</span>
-          </button>
-        </nav>
-
-        {/* Right Actions: Token Quota & Account */}
-        <div className="header-right-actions">
-          {/* Daily Token Quota Pill */}
-          <button
-            className="header-token-badge"
-            onClick={onOpenAuth}
-            title={`Daily Diagnostic Token Quota: ${tokenState.remainingTokens} of ${tokenState.maxTokens} remaining. Click to view account or upgrade.`}
-          >
-            <Zap size={13} className="token-bolt-icon" />
-            <span className="token-counter-text">
-              <strong>{tokenState.remainingTokens}</strong>/{tokenState.maxTokens}
-            </span>
-            <span className="token-label-tag">TOKENS</span>
-          </button>
-
-          {/* Customer Account Button */}
-          <button
-            className={`header-user-btn ${tokenState.tier === 'REGISTERED' ? 'signed-in' : ''}`}
-            onClick={onOpenAuth}
-            title={
-              tokenState.tier === 'REGISTERED'
-                ? `Signed in as ${tokenState.user?.name} (${tokenState.user?.email})`
-                : 'Sign in to unlock 25 tokens/day'
-            }
-          >
-            <User size={14} />
-            <span>
-              {tokenState.tier === 'REGISTERED'
-                ? tokenState.user?.name || 'Account'
-                : 'Sign In'}
-            </span>
-          </button>
-
-          {/* Engine Status Badge */}
-          <div
-            className={`engine-status-badge ${isServerAiOnline ? 'online' : 'fallback'}`}
-            title={
-              isServerAiOnline
-                ? 'Server AI Active with Local Offline Fallback'
-                : '100% Offline Mechatronic Engine Active (0 cost, instant evaluation)'
-            }
-          >
-            <span className="status-ping-dot" />
-            <Sparkles size={12} className="status-sparkle" />
-            <span>{isServerAiOnline ? 'Hybrid AI' : 'Offline Engine'}</span>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Mobile Bottom Navigation Bar (Active on Mobile Phones & Touch Devices < 768px) */}
+      <nav className="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
+        <button
+          className={`mobile-nav-item ${activeTab === 'diagnose' ? 'active' : ''}`}
+          onClick={() => setActiveTab('diagnose')}
+        >
+          <Activity size={18} />
+          <span>Diagnose</span>
+        </button>
+        <button
+          className={`mobile-nav-item ${activeTab === 'evidence' ? 'active' : ''}`}
+          onClick={() => setActiveTab('evidence')}
+        >
+          <FileSearch size={18} />
+          <span>Evidence</span>
+        </button>
+        <button
+          className={`mobile-nav-item ${activeTab === 'garage' ? 'active' : ''}`}
+          onClick={() => setActiveTab('garage')}
+        >
+          <Car size={18} />
+          <span>Garage</span>
+        </button>
+        <button
+          className={`mobile-nav-item ${activeTab === 'maintenance' ? 'active' : ''}`}
+          onClick={() => setActiveTab('maintenance')}
+        >
+          <CalendarCheck size={18} />
+          <span>Service</span>
+        </button>
+        <button
+          className={`mobile-nav-item ${activeTab === 'obd' ? 'active' : ''}`}
+          onClick={() => setActiveTab('obd')}
+        >
+          <Cpu size={18} />
+          <span>OBD-II</span>
+        </button>
+        <button
+          className={`mobile-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+          onClick={() => setActiveTab('settings')}
+        >
+          <Database size={18} />
+          <span>Vault</span>
+        </button>
+      </nav>
+    </>
   )
 }
