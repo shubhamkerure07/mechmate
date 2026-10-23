@@ -6,6 +6,7 @@ import { GarageView } from './components/GarageView'
 import { MaintenanceView } from './components/MaintenanceView'
 import { OBDScannerView } from './components/OBDScannerView'
 import { SettingsView } from './components/SettingsView'
+import { AdminView } from './components/AdminView'
 import { Footer } from './components/Footer'
 import { AuthModal } from './components/AuthModal'
 import { PrivacyPolicyModal } from './components/PrivacyPolicyModal'
@@ -215,6 +216,14 @@ export default function App() {
             onDataReset={loadStateFromStorage}
             onOpenPrivacyPolicy={() => setIsPrivacyModalOpen(true)}
             onOpenAuth={() => setIsAuthModalOpen(true)}
+          />
+        )}
+
+        {activeTab === 'admin' && (
+          <AdminView
+            tokenState={tokenState}
+            onResetTokens={loadStateFromStorage}
+            onSeedComplete={loadStateFromStorage}
           />
         )}
       </main>

@@ -10,12 +10,13 @@ import {
   ChevronDown,
   Sparkles,
   Zap,
-  User
+  User,
+  Sliders
 } from 'lucide-react'
 import { VehicleProfile } from '../types/automotive'
 import { TokenState } from '../services/tokenService'
 
-export type ActiveTab = 'diagnose' | 'evidence' | 'garage' | 'maintenance' | 'obd' | 'settings'
+export type ActiveTab = 'diagnose' | 'evidence' | 'garage' | 'maintenance' | 'obd' | 'settings' | 'admin'
 
 interface HeaderProps {
   activeTab: ActiveTab
@@ -50,14 +51,14 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <div className="brand-text">
                 <div className="brand-title-row">
-                  <span className="brand-name">MechMate</span>
-                  <span className="brand-badge">INTELLIGENCE</span>
+                  <span className="brand-name">MECHMATE</span>
+                  <span className="brand-badge">SWISS // SPEC</span>
                 </div>
-                <span className="brand-tagline">Automotive Diagnostic Platform</span>
+                <span className="brand-tagline">Automotive Intelligence Instrument</span>
               </div>
             </div>
 
-            {/* Active Vehicle Quick Selector (Hidden on small mobile, visible on desktop) */}
+            {/* Active Vehicle Quick Selector */}
             <button
               className={`vehicle-selector-pill ${activeVehicle ? 'has-car' : 'generic'} desktop-only`}
               onClick={() => setActiveTab('garage')}
@@ -80,7 +81,7 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </div>
 
-          {/* Desktop Center Navigation Tabs (Hidden on mobile <768px) */}
+          {/* Desktop Center Navigation Tabs */}
           <nav className="header-nav desktop-nav" aria-label="Main Application Navigation">
             <button
               className={`nav-btn ${activeTab === 'diagnose' ? 'active' : ''}`}
@@ -125,6 +126,14 @@ export const Header: React.FC<HeaderProps> = ({
               <Database size={15} />
               <span>Vault</span>
             </button>
+            <button
+              className={`nav-btn ${activeTab === 'admin' ? 'active' : ''}`}
+              onClick={() => setActiveTab('admin')}
+              title="Administrator Command Console"
+            >
+              <Sliders size={15} />
+              <span>Admin</span>
+            </button>
           </nav>
 
           {/* Right Actions: Token Quota & Account */}
@@ -133,7 +142,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               className="header-token-badge"
               onClick={onOpenAuth}
-              title={`Daily Diagnostic Token Quota: ${tokenState.remainingTokens} of ${tokenState.maxTokens} remaining. Click to view account or upgrade.`}
+              title={`Daily Diagnostic Token Quota: ${tokenState.remainingTokens} of ${tokenState.maxTokens} remaining.`}
             >
               <Zap size={13} className="token-bolt-icon" />
               <span className="token-counter-text">
@@ -160,7 +169,7 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
             </button>
 
-            {/* Engine Status Badge (Desktop only on wide screens) */}
+            {/* Engine Status Badge */}
             <div
               className={`engine-status-badge desktop-only ${isServerAiOnline ? 'online' : 'fallback'}`}
               title={
@@ -171,55 +180,55 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <span className="status-ping-dot" />
               <Sparkles size={12} className="status-sparkle" />
-              <span>{isServerAiOnline ? 'Hybrid AI' : 'Offline Engine'}</span>
+              <span>{isServerAiOnline ? 'Hybrid AI' : 'Offline Core'}</span>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Mobile Bottom Navigation Bar (Active on Mobile Phones & Touch Devices < 768px) */}
+      {/* Mobile Bottom Navigation Bar */}
       <nav className="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
         <button
           className={`mobile-nav-item ${activeTab === 'diagnose' ? 'active' : ''}`}
           onClick={() => setActiveTab('diagnose')}
         >
-          <Activity size={18} />
+          <Activity size={17} />
           <span>Diagnose</span>
         </button>
         <button
           className={`mobile-nav-item ${activeTab === 'evidence' ? 'active' : ''}`}
           onClick={() => setActiveTab('evidence')}
         >
-          <FileSearch size={18} />
+          <FileSearch size={17} />
           <span>Evidence</span>
         </button>
         <button
           className={`mobile-nav-item ${activeTab === 'garage' ? 'active' : ''}`}
           onClick={() => setActiveTab('garage')}
         >
-          <Car size={18} />
+          <Car size={17} />
           <span>Garage</span>
         </button>
         <button
           className={`mobile-nav-item ${activeTab === 'maintenance' ? 'active' : ''}`}
           onClick={() => setActiveTab('maintenance')}
         >
-          <CalendarCheck size={18} />
+          <CalendarCheck size={17} />
           <span>Service</span>
         </button>
         <button
           className={`mobile-nav-item ${activeTab === 'obd' ? 'active' : ''}`}
           onClick={() => setActiveTab('obd')}
         >
-          <Cpu size={18} />
+          <Cpu size={17} />
           <span>OBD-II</span>
         </button>
         <button
-          className={`mobile-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-          onClick={() => setActiveTab('settings')}
+          className={`mobile-nav-item ${activeTab === 'admin' ? 'active' : ''}`}
+          onClick={() => setActiveTab('admin')}
         >
-          <Database size={18} />
-          <span>Vault</span>
+          <Sliders size={17} />
+          <span>Admin</span>
         </button>
       </nav>
     </>

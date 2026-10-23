@@ -1,7 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 /* ==========================================================================
-   MECHMATE MODERN DESIGN SYSTEM (Dark Obsidian / Linear-Inspired Aesthetic)
+   MECHMATE SWISS INSTRUMENTATION DESIGN SYSTEM
+   Inspired by Prägen Hätlen Fine Horology & Haute Horlogerie Engineering
    ========================================================================== */
 
 * {
@@ -11,49 +12,60 @@
 }
 
 :root {
-  /* Surfaces */
-  --bg-canvas: #090a0f;
-  --bg-surface: #0f121d;
-  --bg-surface-elevated: #151928;
-  --bg-surface-hover: #1c2236;
-  --bg-card: #111422;
-  --bg-card-subtle: rgba(255, 255, 255, 0.02);
-  --bg-input: #0b0d16;
+  /* Surfaces - Abyssal Void & Brushed Titanium */
+  --bg-canvas: #050608;
+  --bg-surface: #0a0c12;
+  --bg-surface-elevated: #11141e;
+  --bg-surface-hover: #171b29;
+  --bg-card: #0c0e15;
+  --bg-card-subtle: rgba(212, 175, 55, 0.025);
+  --bg-input: #07080d;
 
-  /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-medium: rgba(255, 255, 255, 0.12);
-  --border-focus: #f59e0b;
+  /* Borders - Milled Metal & Auric Hairlines */
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-medium: rgba(255, 255, 255, 0.14);
+  --border-gold: rgba(212, 175, 55, 0.32);
+  --border-focus: #d4af37;
 
-  /* Accent Brand Colors */
-  --brand-amber: #f59e0b;
-  --brand-amber-light: #fbbf24;
-  --brand-amber-subtle: rgba(245, 158, 11, 0.12);
-  --brand-amber-glow: rgba(245, 158, 11, 0.25);
+  /* Precision Horological Gold & Auric Accents */
+  --brand-gold: #d4af37;
+  --brand-gold-light: #f5e6a8;
+  --brand-gold-bright: #e5c07b;
+  --brand-gold-dark: #997819;
+  --brand-gold-subtle: rgba(212, 175, 55, 0.12);
+  --brand-gold-glow: rgba(212, 175, 55, 0.32);
 
-  /* Status Colors */
-  --color-danger: #ef4444;
-  --color-danger-subtle: rgba(239, 68, 68, 0.12);
-  --color-danger-border: rgba(239, 68, 68, 0.3);
+  /* Map brand-amber to refined champagne gold for seamless component compatibility */
+  --brand-amber: #d4af37;
+  --brand-amber-light: #e5c07b;
+  --brand-amber-subtle: rgba(212, 175, 55, 0.12);
+  --brand-amber-glow: rgba(212, 175, 55, 0.30);
 
-  --color-warning: #f59e0b;
-  --color-warning-subtle: rgba(245, 158, 11, 0.12);
-  --color-warning-border: rgba(245, 158, 11, 0.3);
+  /* Status Colors - Horological Calibre Jewel Indicators */
+  --color-danger: #f43f5e;
+  --color-danger-subtle: rgba(244, 63, 94, 0.12);
+  --color-danger-border: rgba(244, 63, 94, 0.38);
+
+  --color-warning: #d4af37;
+  --color-warning-subtle: rgba(212, 175, 55, 0.12);
+  --color-warning-border: rgba(212, 175, 55, 0.35);
 
   --color-success: #10b981;
   --color-success-subtle: rgba(16, 185, 129, 0.12);
-  --color-success-border: rgba(16, 185, 129, 0.3);
+  --color-success-border: rgba(16, 185, 129, 0.35);
 
   --color-cyan: #38bdf8;
   --color-cyan-subtle: rgba(56, 189, 248, 0.12);
-  --color-cyan-border: rgba(56, 189, 248, 0.3);
+  --color-cyan-border: rgba(56, 189, 248, 0.35);
 
   /* Typography */
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #8492a6;
-  --text-faint: #475569;
+  --text-primary: #fcfcfd;
+  --text-secondary: #c5cbd8;
+  --text-muted: #798396;
+  --text-faint: #434c5e;
 
+  --font-serif-display: 'Cinzel', serif;
+  --font-display: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
@@ -65,17 +77,21 @@
   --radius-xl: 18px;
   --radius-full: 9999px;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.65);
+  --shadow-lg: 0 16px 42px rgba(0, 0, 0, 0.85);
+  --shadow-gold: 0 0 25px rgba(212, 175, 55, 0.22);
 }
 
 html, body, #root {
   min-height: 100%;
   background-color: var(--bg-canvas);
   background-image: 
-    radial-gradient(ellipse at 50% -10%, rgba(245, 158, 11, 0.08), transparent 60%),
-    radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.03), transparent 40%);
+    radial-gradient(ellipse 80% 50% at 50% -15%, rgba(212, 175, 55, 0.12), transparent 75%),
+    radial-gradient(circle 700px at 100% 100%, rgba(56, 189, 248, 0.04), transparent 60%),
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 56px 56px, 56px 56px;
   background-attachment: fixed;
   color: var(--text-primary);
   font-family: var(--font-sans);
@@ -83,11 +99,11 @@ html, body, #root {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom Sleek Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: var(--radius-full); }
-::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+/* Custom Sleek Horological Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #050608; }
+::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.3); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--brand-gold); }
 
 /* ==========================================================================
    APP SHELL & LAYOUT
@@ -420,39 +436,43 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
-  color: #0b0d14;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #f5e6a8 0%, #d4af37 40%, #b89327 100%);
+  color: #06070a;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   padding: 10px 18px;
-  border-radius: var(--radius-md);
-  font-size: 0.88rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 18px rgba(212, 175, 55, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(180deg, #fcd34d 0%, #fbbf24 100%);
+  background: linear-gradient(135deg, #fff3c4 0%, #e5c07b 40%, #c9a334 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+  box-shadow: 0 6px 24px rgba(212, 175, 55, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  filter: brightness(1.05);
 }
 
 .btn-primary:disabled {
   opacity: 0.45;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 .btn-primary.small {
   padding: 6px 12px;
-  font-size: 0.78rem;
-  border-radius: var(--radius-sm);
+  font-size: 0.76rem;
+  border-radius: var(--radius-xs);
 }
 
 .btn-primary.large {
-  padding: 13px 24px;
-  font-size: 0.95rem;
+  padding: 13px 26px;
+  font-size: 0.92rem;
 }
 
 .btn-secondary {
@@ -460,20 +480,23 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  background: var(--bg-surface-elevated);
-  color: var(--text-primary);
-  border: 1px solid var(--border-medium);
+  background: rgba(17, 20, 29, 0.85);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 9px 16px;
-  border-radius: var(--radius-md);
-  font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.83rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  letter-spacing: 0.02em;
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: var(--bg-surface-hover);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(24, 28, 42, 0.95);
+  border-color: rgba(212, 175, 55, 0.35);
+  color: var(--brand-gold-bright);
 }
 
 .btn-secondary:disabled {
@@ -483,8 +506,8 @@ html, body, #root {
 
 .btn-secondary.small {
   padding: 6px 12px;
-  font-size: 0.78rem;
-  border-radius: var(--radius-sm);
+  font-size: 0.76rem;
+  border-radius: var(--radius-xs);
 }
 
 .btn-danger {
@@ -3875,4 +3898,227 @@ input, select, textarea {
     white-space: nowrap;
   }
 }
+
+/* ==========================================================================
+   ADMIN ARCHITECT COMMAND CONSOLE & SWISS TELEMETRY (AdminView.tsx)
+   ========================================================================== */
+
+.admin-auth-surface {
+  max-width: 500px;
+  margin: 60px auto;
+  padding: 36px 32px;
+  background: linear-gradient(180deg, rgba(17, 20, 30, 0.95) 0%, rgba(9, 11, 16, 0.98) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(212, 175, 55, 0.25);
+  text-align: center;
+}
+
+.admin-lock-icon-wrap {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.04) 70%);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand-gold-bright);
+  box-shadow: 0 0 28px rgba(212, 175, 55, 0.25);
+}
+
+.admin-auth-header {
+  margin-bottom: 24px;
+}
+
+.admin-auth-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 10px 0 8px;
+  letter-spacing: -0.01em;
+}
+
+.admin-auth-header p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.admin-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.admin-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.admin-form-group label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: var(--font-mono);
+}
+
+.admin-form-group input {
+  background: var(--bg-input);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: all 0.15s ease;
+}
+
+.admin-form-group input:focus {
+  outline: none;
+  border-color: var(--brand-gold);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.25);
+}
+
+.admin-actions-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+/* Engine Mode Selector Tiles */
+.engine-mode-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.engine-mode-tile {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.engine-mode-tile:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(212, 175, 55, 0.25);
+}
+
+.engine-mode-tile.active {
+  background: rgba(212, 175, 55, 0.07);
+  border-color: rgba(212, 175, 55, 0.45);
+  box-shadow: 0 0 18px rgba(212, 175, 55, 0.12);
+}
+
+.engine-mode-tile input[type="radio"] {
+  accent-color: var(--brand-gold);
+  margin-top: 3px;
+  cursor: pointer;
+}
+
+.engine-mode-tile strong {
+  display: block;
+  font-size: 0.88rem;
+  color: #ffffff;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.engine-mode-tile span {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+/* Safety Fault Simulator */
+.simulator-buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.simulation-result-card {
+  background: rgba(14, 16, 24, 0.95);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  margin-top: 16px;
+  box-shadow: 0 0 25px rgba(244, 63, 94, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.simulation-meta-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  font-size: 0.74rem;
+  font-family: var(--font-mono);
+}
+
+.sim-warning-box {
+  background: rgba(244, 63, 94, 0.1);
+  border-left: 3px solid #f43f5e;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  color: #fecdd3;
+  margin-bottom: 14px;
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+  line-height: 1.5;
+}
+
+.sim-matches-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sim-match-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-xs);
+  font-size: 0.82rem;
+  gap: 12px;
+}
+
+.sim-match-item .match-name {
+  font-weight: 700;
+  color: #f43f5e;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.sim-match-item .match-action {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .engine-mode-selector {
+    grid-template-columns: 1fr;
+  }
+}
+
 
