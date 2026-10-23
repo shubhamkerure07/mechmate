@@ -6,6 +6,9 @@ import { GarageView } from './components/GarageView'
 import { MaintenanceView } from './components/MaintenanceView'
 import { OBDScannerView } from './components/OBDScannerView'
 import { SettingsView } from './components/SettingsView'
+import { Footer } from './components/Footer'
+import { AuthModal } from './components/AuthModal'
+import { PrivacyPolicyModal } from './components/PrivacyPolicyModal'
 import {
   DiagnosticAssessment,
   MaintenanceItem,
@@ -24,6 +27,7 @@ import {
   markMaintenanceCompleted
 } from './services/storageService'
 import { generateDefaultScheduleForVehicle } from './services/maintenanceService'
+import { getTokenUsage, consumeToken, TokenState } from './services/tokenService'
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('diagnose')
@@ -32,6 +36,11 @@ export default function App() {
   const [currentAssessment, setCurrentAssessment] = useState<DiagnosticAssessment | null>(null)
   const [maintenanceItems, setMaintenanceItems] = useState<MaintenanceItem[]>([])
   const [isServerAiOnline, setIsServerAiOnline] = useState<boolean>(false)
+
+  // Customer Token & Auth State
+  const [tokenState, setTokenState] = useState<TokenState>(getTokenUsage())
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false)
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState<boolean>(false)
 
   // Initialize data from local storage
   const loadStateFromStorage = () => {
@@ -57,6 +66,9 @@ export default function App() {
     } else {
       setMaintenanceItems([])
     }
+
+    // Refresh token state
+    setTokenState(getTokenUsage())
   }
 
   useEffect(() => {
@@ -132,6 +144,16 @@ export default function App() {
     }
   }
 
+  // Token deduction handler
+  const handleConsumeToken = (): boolean => {
+    const res = consumeToken(1)
+    if (res.success) {
+      setTokenState(res.state)
+      return true
+    }
+    return false
+  }
+
   return (
     <div className="app-shell">
       <Header
@@ -139,6 +161,8 @@ export default function App() {
         setActiveTab={setActiveTab}
         activeVehicle={activeVehicle}
         isServerAiOnline={isServerAiOnline}
+        tokenState={tokenState}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
       />
 
       <main className="main-content" role="main">
@@ -146,6 +170,10 @@ export default function App() {
           <DiagnoseView
             activeVehicle={activeVehicle}
             currentAssessment={currentAssessment}
+            tokenState={tokenState}
+            onConsumeToken={handleConsumeToken}
+            onOpenAuth={() => setIsAuthModalOpen(true)}
+            onOpenPrivacyPolicy={() => setIsPrivacyModalOpen(true)}
             onAssessmentCompleted={handleAssessmentCompleted}
             onOpenEvidenceExplorer={() => setActiveTab('evidence')}
             onOpenGarage={() => setActiveTab('garage')}
@@ -183,9 +211,41 @@ export default function App() {
         {activeTab === 'obd' && <OBDScannerView />}
 
         {activeTab === 'settings' && (
-          <SettingsView onDataReset={loadStateFromStorage} />
+          <SettingsView
+            onDataReset={loadStateFromStorage}
+            onOpenPrivacyPolicy={() => setIsPrivacyModalOpen(true)}
+            onOpenAuth={() => setIsAuthModalOpen(true)}
+          />
         )}
       </main>
+
+      <Footer
+        tokenState={tokenState}
+        onOpenPrivacyPolicy={() => setIsPrivacyModalOpen(true)}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+      />
+
+      {/* Customer Sign-In / Token Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        tokenState={tokenState}
+        onTokenStateChange={setTokenState}
+        onOpenPrivacyPolicy={() => {
+          setIsAuthModalOpen(false)
+          setIsPrivacyModalOpen(true)
+        }}
+      />
+
+      {/* Comprehensive Privacy Policy & Token Terms Modal */}
+      <PrivacyPolicyModal
+        isOpen={isPrivacyModalOpen}
+        onClose={() => setIsPrivacyModalOpen(false)}
+        onOpenAuth={() => {
+          setIsPrivacyModalOpen(false)
+          setIsAuthModalOpen(true)
+        }}
+      />
     </div>
   )
 }

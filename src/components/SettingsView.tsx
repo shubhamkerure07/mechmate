@@ -16,9 +16,15 @@ import {
 
 interface SettingsViewProps {
   onDataReset: () => void
+  onOpenPrivacyPolicy?: () => void
+  onOpenAuth?: () => void
 }
 
-export const SettingsView: React.FC<SettingsViewProps> = ({ onDataReset }) => {
+export const SettingsView: React.FC<SettingsViewProps> = ({
+  onDataReset,
+  onOpenPrivacyPolicy,
+  onOpenAuth
+}) => {
   const [importJsonText, setImportJsonText] = useState('')
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
@@ -129,6 +135,15 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onDataReset }) => {
               <span><strong>Offline Capable:</strong> Deterministic diagnostic engine operates without network connection.</span>
             </li>
           </ul>
+
+          {onOpenPrivacyPolicy && (
+            <div style={{ marginTop: '16px' }}>
+              <button className="btn-secondary small" onClick={onOpenPrivacyPolicy}>
+                <ShieldCheck size={14} />
+                <span>Read Full Customer Privacy Policy</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Operating Cost Economics Card */}
@@ -144,7 +159,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onDataReset }) => {
           </div>
 
           <p className="vault-text">
-            Designed to demonstrate sustainable software engineering with zero mandatory monthly operational subscriptions:
+            Designed to demonstrate sustainable software engineering with fair daily token quotas:
           </p>
 
           <ul className="vault-features-list">
@@ -154,17 +169,26 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onDataReset }) => {
             </li>
             <li>
               <ShieldCheck size={15} className="text-amber" />
-              <span><strong>Vercel Edge Network:</strong> Hosted entirely within generous standard free tiers.</span>
+              <span><strong>Anonymous Drivers:</strong> 5 free full diagnostic consultations every 24-hour cycle.</span>
             </li>
             <li>
               <RefreshCw size={15} className="text-amber" />
-              <span><strong>Gemini Cloud Tier:</strong> Free quota with client-side rate dampening and fallback safety net.</span>
+              <span><strong>Registered Customers:</strong> 25 free daily consultations unlocked upon email sign-in.</span>
             </li>
             <li>
               <Database size={15} className="text-amber" />
               <span><strong>LocalStorage Vault:</strong> Avoids expensive managed database hosting fees.</span>
             </li>
           </ul>
+
+          {onOpenAuth && (
+            <div style={{ marginTop: '16px' }}>
+              <button className="btn-secondary small" onClick={onOpenAuth}>
+                <Zap size={14} />
+                <span>Manage Customer Account & Token Quota</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Data Vault: Export & Import */}

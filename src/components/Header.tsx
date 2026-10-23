@@ -8,9 +8,12 @@ import {
   Cpu,
   Database,
   ChevronDown,
-  Sparkles
+  Sparkles,
+  Zap,
+  User
 } from 'lucide-react'
 import { VehicleProfile } from '../types/automotive'
+import { TokenState } from '../services/tokenService'
 
 export type ActiveTab = 'diagnose' | 'evidence' | 'garage' | 'maintenance' | 'obd' | 'settings'
 
@@ -19,13 +22,17 @@ interface HeaderProps {
   setActiveTab: (tab: ActiveTab) => void
   activeVehicle: VehicleProfile | null
   isServerAiOnline: boolean
+  tokenState: TokenState
+  onOpenAuth: () => void
 }
 
 export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
   activeVehicle,
-  isServerAiOnline
+  isServerAiOnline,
+  tokenState,
+  onOpenAuth
 }) => {
   return (
     <header className="header">
@@ -119,8 +126,40 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </nav>
 
-        {/* Right Engine Status */}
+        {/* Right Actions: Token Quota & Account */}
         <div className="header-right-actions">
+          {/* Daily Token Quota Pill */}
+          <button
+            className="header-token-badge"
+            onClick={onOpenAuth}
+            title={`Daily Diagnostic Token Quota: ${tokenState.remainingTokens} of ${tokenState.maxTokens} remaining. Click to view account or upgrade.`}
+          >
+            <Zap size={13} className="token-bolt-icon" />
+            <span className="token-counter-text">
+              <strong>{tokenState.remainingTokens}</strong>/{tokenState.maxTokens}
+            </span>
+            <span className="token-label-tag">TOKENS</span>
+          </button>
+
+          {/* Customer Account Button */}
+          <button
+            className={`header-user-btn ${tokenState.tier === 'REGISTERED' ? 'signed-in' : ''}`}
+            onClick={onOpenAuth}
+            title={
+              tokenState.tier === 'REGISTERED'
+                ? `Signed in as ${tokenState.user?.name} (${tokenState.user?.email})`
+                : 'Sign in to unlock 25 tokens/day'
+            }
+          >
+            <User size={14} />
+            <span>
+              {tokenState.tier === 'REGISTERED'
+                ? tokenState.user?.name || 'Account'
+                : 'Sign In'}
+            </span>
+          </button>
+
+          {/* Engine Status Badge */}
           <div
             className={`engine-status-badge ${isServerAiOnline ? 'online' : 'fallback'}`}
             title={
@@ -130,8 +169,8 @@ export const Header: React.FC<HeaderProps> = ({
             }
           >
             <span className="status-ping-dot" />
-            <Sparkles size={13} className="status-sparkle" />
-            <span>{isServerAiOnline ? 'Hybrid AI Ready' : 'Mechatronic Engine'}</span>
+            <Sparkles size={12} className="status-sparkle" />
+            <span>{isServerAiOnline ? 'Hybrid AI' : 'Offline Engine'}</span>
           </div>
         </div>
       </div>

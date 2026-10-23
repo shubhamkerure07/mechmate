@@ -7,6 +7,8 @@ import {
 import { getRecommendedFollowUps } from '../services/followUpQuestions'
 import { runDiagnosticEngine } from '../services/diagnosticEngine'
 import { sendMessage } from '../services/gemini'
+import { evaluateSafetyRules } from '../services/safetyEngine'
+import { TokenState } from '../services/tokenService'
 import {
   AlertTriangle,
   ShieldAlert,
@@ -24,12 +26,18 @@ import {
   Zap,
   Wind,
   Gauge,
-  Wrench
+  Wrench,
+  ShieldCheck,
+  UserCheck
 } from 'lucide-react'
 
 interface DiagnoseViewProps {
   activeVehicle: VehicleProfile | null
   currentAssessment: DiagnosticAssessment | null
+  tokenState: TokenState
+  onConsumeToken: () => boolean
+  onOpenAuth: () => void
+  onOpenPrivacyPolicy: () => void
   onAssessmentCompleted: (assessment: DiagnosticAssessment) => void
   onOpenEvidenceExplorer: () => void
   onOpenGarage: () => void
@@ -71,6 +79,10 @@ const SYMPTOM_PRESETS = [
 export const DiagnoseView: React.FC<DiagnoseViewProps> = ({
   activeVehicle,
   currentAssessment,
+  tokenState,
+  onConsumeToken,
+  onOpenAuth,
+  onOpenPrivacyPolicy,
   onAssessmentCompleted,
   onOpenEvidenceExplorer,
   onOpenGarage
@@ -80,6 +92,7 @@ export const DiagnoseView: React.FC<DiagnoseViewProps> = ({
   const [followUpAnswers, setFollowUpAnswers] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
   const [isConsultationActive, setIsConsultationActive] = useState(false)
+  const [tokenExhaustedWarning, setTokenExhaustedWarning] = useState(false)
 
   // Interactive follow-up Q&A chat
   const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'assistant'; text: string }>>([])
@@ -91,6 +104,24 @@ export const DiagnoseView: React.FC<DiagnoseViewProps> = ({
     if (!text) return
 
     setSymptomInput(text)
+    setTokenExhaustedWarning(false)
+
+    // Token Quota Verification
+    if (tokenState.remainingTokens <= 0) {
+      // Deterministic Roadside Safety Triage Exemption:
+      // Critical hazards like brakes, overheating, oil pressure are ALWAYS FREE!
+      const safety = evaluateSafetyRules(text)
+      if (safety.requiresImmediateStop) {
+        executeFreeSafetyDirective(text, safety)
+        return
+      }
+
+      // Non-critical: prompt customer to sign in to unlock 25 tokens
+      setTokenExhaustedWarning(true)
+      onOpenAuth()
+      return
+    }
+
     const questions = getRecommendedFollowUps(text)
     setFollowUps(questions)
     setFollowUpAnswers({})
@@ -100,6 +131,55 @@ export const DiagnoseView: React.FC<DiagnoseViewProps> = ({
     if (questions.length === 0) {
       executeDiagnosis(text, {})
     }
+  }
+
+  const executeFreeSafetyDirective = (text: string, safety: ReturnType<typeof evaluateSafetyRules>) => {
+    const safetyAssessment: DiagnosticAssessment = {
+      id: 'diag_safety_exempt_' + Date.now(),
+      vehicle: activeVehicle,
+      timestamp: new Date().toISOString(),
+      rawInput: text,
+      symptomSummary: 'EMERGENCY SAFETY DIRECTIVE: ' + text,
+      safety,
+      potentialCauses: [
+        {
+          id: 'safety_override_exempt',
+          name: safety.matches[0]?.hazardName || 'Imminent Mechanical Hazard',
+          systemCategory: 'Brakes',
+          probability: 'Likely',
+          reasoning: safety.summaryWarning,
+          evidence: {
+            supporting: ['Roadside hazard criteria confirmed by deterministic mechatronic safety triage.'],
+            contradicting: [],
+            missingInfo: ['Requires on-site certified mechanic inspection.'],
+            discriminatingTest: 'Immediate vehicle shutdown and roadside assistance.'
+          },
+          safeUserInspection: 'Stop immediately in a safe location, switch off the engine, and exit the traffic lane.',
+          professionalMechanicSteps: ['Inspect hydraulic brake lines, calipers, or coolant loops before restarting.'],
+          professionalInspectionRequired: true
+        }
+      ],
+      costEstimate: {
+        partsMinINR: 1500,
+        partsMaxINR: 15000,
+        laborMinINR: 800,
+        laborMaxINR: 4000,
+        totalMinINR: 2300,
+        totalMaxINR: 19000,
+        confidence: 'indicative_range',
+        assumptions: 'Critical safety triage is 100% free under MechMate Customer Safety Policy.',
+        dataSource: 'Deterministic Safety Engine',
+        lastUpdated: 'October 2026'
+      },
+      limitations: [
+        'Safety exemption applied: This emergency directive was generated without consuming daily tokens because critical roadside safety is never paywalled.'
+      ],
+      confidenceScoreText: 'Deterministic High Severity Rule Match (100% Deterministic Safety Engine)',
+      providerOrigin: 'deterministic_engine'
+    }
+
+    onAssessmentCompleted(safetyAssessment)
+    setIsConsultationActive(false)
   }
 
   const handleAnswerFollowUp = (questionId: string, value: string) => {
@@ -114,6 +194,28 @@ export const DiagnoseView: React.FC<DiagnoseViewProps> = ({
     answers: Record<string, string>,
     prevAssessment?: DiagnosticAssessment | null
   ) => {
+    // If not a re-evaluation and tokens are empty, verify token quota
+    if (!prevAssessment) {
+      if (tokenState.remainingTokens <= 0) {
+        const safety = evaluateSafetyRules(textToAnalyze)
+        if (safety.requiresImmediateStop) {
+          executeFreeSafetyDirective(textToAnalyze, safety)
+          return
+        }
+        setTokenExhaustedWarning(true)
+        onOpenAuth()
+        return
+      }
+
+      // Deduct token
+      const consumed = onConsumeToken()
+      if (!consumed) {
+        setTokenExhaustedWarning(true)
+        onOpenAuth()
+        return
+      }
+    }
+
     setLoading(true)
     try {
       const assessment = await runDiagnosticEngine({
@@ -185,6 +287,7 @@ export const DiagnoseView: React.FC<DiagnoseViewProps> = ({
     setFollowUpAnswers({})
     setIsConsultationActive(false)
     setChatMessages([])
+    setTokenExhaustedWarning(false)
   }
 
   return (
@@ -233,7 +336,58 @@ export const DiagnoseView: React.FC<DiagnoseViewProps> = ({
             )}
           </div>
         </div>
+
+        {/* Customer Daily Token Allowance Banner */}
+        <div className="token-status-strip">
+          <div className="token-strip-left">
+            <Zap size={15} className="token-bolt" />
+            <span>
+              Daily Diagnostic Allowance:{' '}
+              <strong>{tokenState.remainingTokens}</strong> / {tokenState.maxTokens} Tokens Remaining
+            </span>
+            <span className="token-tier-pill">{tokenState.tier}</span>
+          </div>
+          <div className="token-strip-right">
+            {tokenState.tier === 'ANONYMOUS' ? (
+              <button className="token-upgrade-link" onClick={onOpenAuth}>
+                <UserCheck size={13} />
+                <span>Sign in for 25 tokens/day</span>
+              </button>
+            ) : (
+              <span className="token-reset-text">Resets at 00:00 local time</span>
+            )}
+            <button className="token-policy-link" onClick={onOpenPrivacyPolicy}>
+              Policy
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* Token Limit Exceeded Notification Banner */}
+      {tokenExhaustedWarning && (
+        <div className="token-exhausted-card animate-fade-in">
+          <div className="exhausted-header">
+            <AlertTriangle size={20} className="text-warning" />
+            <div>
+              <h4>Daily Free Diagnostic Allowance Reached ({tokenState.maxTokens}/{tokenState.maxTokens} Used)</h4>
+              <p>
+                Anonymous drivers receive 5 free comprehensive consultations every 24 hours.
+                Sign in with your email to unlock <strong>25 daily diagnostic consultations</strong> immediately at zero cost.
+              </p>
+            </div>
+          </div>
+          <div className="exhausted-actions">
+            <button className="btn-primary" onClick={onOpenAuth}>
+              <Zap size={15} />
+              <span>Sign In to Unlock 25 Tokens</span>
+            </button>
+            <button className="btn-secondary" onClick={onOpenPrivacyPolicy}>
+              <ShieldCheck size={15} />
+              <span>Review Privacy & Token Policy</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Main Intake Card */}
       <div className="intake-surface-card">
@@ -270,7 +424,9 @@ export const DiagnoseView: React.FC<DiagnoseViewProps> = ({
           />
 
           <div className="prompt-bottom-bar">
-            <span className="prompt-hint">Natural language symptom processing · Deterministic safety triage</span>
+            <span className="prompt-hint">
+              Natural language symptom processing · 1 token per full diagnosis · Roadside safety triage is always free
+            </span>
             <div className="prompt-actions">
               {(currentAssessment || isConsultationActive) && (
                 <button className="btn-secondary" onClick={handleResetConsultation}>
