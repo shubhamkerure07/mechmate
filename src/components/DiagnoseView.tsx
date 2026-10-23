@@ -7,6 +7,25 @@ import {
 import { getRecommendedFollowUps } from '../services/followUpQuestions'
 import { runDiagnosticEngine } from '../services/diagnosticEngine'
 import { sendMessage } from '../services/gemini'
+import {
+  AlertTriangle,
+  ShieldAlert,
+  ArrowRight,
+  Sparkles,
+  HelpCircle,
+  ExternalLink,
+  RotateCcw,
+  CheckCircle2,
+  Send,
+  Car,
+  Disc,
+  BatteryCharging,
+  Thermometer,
+  Zap,
+  Wind,
+  Gauge,
+  Wrench
+} from 'lucide-react'
 
 interface DiagnoseViewProps {
   activeVehicle: VehicleProfile | null
@@ -16,40 +35,34 @@ interface DiagnoseViewProps {
   onOpenGarage: () => void
 }
 
-const SYMPTOM_TAGS = [
+const SYMPTOM_PRESETS = [
   {
-    tag: '#brakes.metal_grinding',
-    icon: '🛑',
+    icon: Disc,
     label: 'Brakes grinding',
     symptom: 'My brakes make a loud metal grinding noise when I slow down, and stopping distance feels longer.'
   },
   {
-    tag: '#electrical.no_crank',
-    icon: '🔋',
+    icon: BatteryCharging,
     label: 'Morning no-start',
     symptom: 'The car refuses to crank in the morning. When I turn the key there is a rapid clicking sound.'
   },
   {
-    tag: '#cooling.thermal_spike',
-    icon: '🌡️',
-    label: 'Overheating in traffic',
+    icon: Thermometer,
+    label: 'Engine overheating',
     symptom: 'Engine temperature gauge rises into the red zone after 15 minutes of driving in traffic.'
   },
   {
-    tag: '#engine.cel_misfire',
-    icon: '💡',
-    label: 'Check engine & jerking',
+    icon: Zap,
+    label: 'Check engine & misfire',
     symptom: 'Check Engine light is illuminated and the car shudders and hesitates when accelerating.'
   },
   {
-    tag: '#exhaust.sweet_white_smoke',
-    icon: '💨',
+    icon: Wind,
     label: 'White exhaust smoke',
     symptom: 'I see thick white smoke with a sweet smell coming from the exhaust tailpipe.'
   },
   {
-    tag: '#transmission.clutch_slip',
-    icon: '⚙️',
+    icon: Gauge,
     label: 'Clutch slipping',
     symptom: 'Engine revs climb high when climbing inclines but the car barely speeds up.'
   }
@@ -68,7 +81,7 @@ export const DiagnoseView: React.FC<DiagnoseViewProps> = ({
   const [loading, setLoading] = useState(false)
   const [isConsultationActive, setIsConsultationActive] = useState(false)
 
-  // Interactive follow-up Q&A chat inside assessment
+  // Interactive follow-up Q&A chat
   const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'assistant'; text: string }>>([])
   const [chatInput, setChatInput] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
@@ -83,7 +96,7 @@ export const DiagnoseView: React.FC<DiagnoseViewProps> = ({
     setFollowUpAnswers({})
     setIsConsultationActive(true)
 
-    // If no follow-up questions needed, directly execute
+    // Direct execution if no follow-ups needed
     if (questions.length === 0) {
       executeDiagnosis(text, {})
     }
@@ -129,7 +142,8 @@ export const DiagnoseView: React.FC<DiagnoseViewProps> = ({
     setChatInput('')
     setChatLoading(true)
 
-    const isNewSymptom = text.toLowerCase().includes('also') ||
+    const isNewSymptom =
+      text.toLowerCase().includes('also') ||
       text.toLowerCase().includes('now') ||
       text.toLowerCase().includes('started') ||
       text.toLowerCase().includes('smell') ||
@@ -142,7 +156,7 @@ export const DiagnoseView: React.FC<DiagnoseViewProps> = ({
         ...prev,
         {
           role: 'assistant',
-          text: `[RE-EVALUATED] Diagnostic model updated with entry: "${text}". See adjusted causes and safety directives above.`
+          text: `Diagnostic model updated with: "${text}". See adjusted causes and safety directives above.`
         }
       ])
       setChatLoading(false)
@@ -157,7 +171,7 @@ export const DiagnoseView: React.FC<DiagnoseViewProps> = ({
         ...prev,
         {
           role: 'assistant',
-          text: 'Advisory fallback active. Reference the verified inspection checklist above for next diagnostic steps.'
+          text: 'Advisory offline engine active. Refer to the structured report above for verified inspection steps.'
         }
       ])
     } finally {
@@ -174,145 +188,142 @@ export const DiagnoseView: React.FC<DiagnoseViewProps> = ({
   }
 
   return (
-    <div className="view-container note-page-layout">
-      {/* Editorial Note Header */}
-      <div className="note-dossier-header">
-        <div className="dossier-meta-strip">
-          <span className="mono-badge">DOC // FIELD_DIAGNOSTICS</span>
-          <span className="meta-divider">/</span>
-          <span className="mono-text">SEC_LEVEL: DETERMINISTIC_SAFE</span>
-          <span className="meta-divider">/</span>
-          <span className="mono-text">REV: 2026.10</span>
-        </div>
-
-        <div className="dossier-title-group">
-          <h2 className="dossier-title">Automotive Diagnostic Notebook</h2>
-          <p className="dossier-sub">
-            Structured mechatronic intake: logs physical observations, assesses roadside hazard urgency,
-            and isolates root mechanical causes before workshop teardown.
+    <div className="view-layout">
+      {/* Hero Welcome & Vehicle Target Bar */}
+      <div className="diagnose-hero-header">
+        <div className="hero-text-block">
+          <div className="hero-badge">
+            <Sparkles size={13} className="hero-badge-icon" />
+            <span>AI Automotive Intelligence</span>
+          </div>
+          <h1 className="hero-title">What is your vehicle experiencing?</h1>
+          <p className="hero-subtitle">
+            Describe symptoms in your own words. MechMate investigates probable causes, evaluates roadside safety urgency,
+            and calculates realistic repair costs in ₹.
           </p>
         </div>
 
-        {/* Frontmatter Metadata Block */}
-        <div className="frontmatter-card">
-          <div className="frontmatter-row">
-            <span className="fm-key">target_vehicle:</span>
-            {activeVehicle ? (
-              <span className="fm-val active">
-                {activeVehicle.year} {activeVehicle.make} {activeVehicle.model} ({activeVehicle.fuelType}, {activeVehicle.transmission})
-                <button className="fm-action" onClick={onOpenGarage}>[switch_profile]</button>
-              </span>
-            ) : (
-              <span className="fm-val generic">
-                generic_unspecified_vehicle
-                <button className="fm-action" onClick={onOpenGarage}>[assign_car]</button>
-              </span>
-            )}
+        {/* Target Vehicle Banner */}
+        <div className="active-vehicle-card-banner">
+          <div className="av-left">
+            <div className="av-icon-wrap">
+              <Car size={18} />
+            </div>
+            <div>
+              <span className="av-label">Calibrated Target Vehicle</span>
+              <div className="av-name">
+                {activeVehicle ? (
+                  <strong>{activeVehicle.year} {activeVehicle.make} {activeVehicle.model}</strong>
+                ) : (
+                  <span className="generic-title">Generic Unspecified Vehicle</span>
+                )}
+              </div>
+            </div>
           </div>
-          <div className="frontmatter-row">
-            <span className="fm-key">odometer_reading:</span>
-            <span className="fm-val mono">
-              {activeVehicle ? `${activeVehicle.odometerKm.toLocaleString('en-IN')} km` : 'none'}
-            </span>
-            <span className="fm-key ml-auto">region_spec:</span>
-            <span className="fm-val mono">{activeVehicle?.region || 'India (Standard Aftermarket)'}</span>
+          <div className="av-right">
+            {activeVehicle ? (
+              <>
+                <span className="av-chip">{activeVehicle.fuelType}</span>
+                <span className="av-chip">{activeVehicle.transmission}</span>
+                <span className="av-chip">{activeVehicle.odometerKm.toLocaleString('en-IN')} km</span>
+                <button className="av-change-btn" onClick={onOpenGarage}>Change</button>
+              </>
+            ) : (
+              <button className="av-add-btn" onClick={onOpenGarage}>+ Select Car in Garage</button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Step 1: Technical Symptom Scratchpad */}
-      <div className="note-card intake-section">
-        <div className="card-section-header">
-          <span className="section-index">01</span>
-          <div>
-            <h3>Symptom Intake & Field Notes</h3>
-            <p className="section-desc">Record anomalous noises, vibrations, smells, leaks, or instrument warnings:</p>
-          </div>
+      {/* Main Intake Card */}
+      <div className="intake-surface-card">
+        <div className="intake-card-top">
+          <span className="intake-step-indicator">STEP 1</span>
+          <h2 className="intake-card-title">Describe Problem or Report Symptoms</h2>
         </div>
 
-        {/* Quick Tag Pills */}
-        <div className="tag-chips-bar">
-          <span className="chips-hint">Preset scenarios:</span>
-          {SYMPTOM_TAGS.map((tagItem, idx) => (
-            <button
-              key={idx}
-              className="coded-tag-btn"
-              onClick={() => handleStartAnalysis(tagItem.symptom)}
-            >
-              <span className="tag-hash">{tagItem.tag}</span>
-            </button>
-          ))}
+        {/* Quick Symptom Chips */}
+        <div className="presets-scroll-row">
+          {SYMPTOM_PRESETS.map((preset, idx) => {
+            const Icon = preset.icon
+            return (
+              <button
+                key={idx}
+                className="preset-chip-btn"
+                onClick={() => handleStartAnalysis(preset.symptom)}
+              >
+                <Icon size={14} className="preset-chip-icon" />
+                <span>{preset.label}</span>
+              </button>
+            )
+          })}
         </div>
 
-        {/* Scratchpad Textarea */}
-        <div className="scratchpad-wrapper">
-          <div className="line-numbers-col" aria-hidden="true">
-            <span>01</span>
-            <span>02</span>
-            <span>03</span>
-            <span>04</span>
-          </div>
+        {/* Textarea Input Box */}
+        <div className="prompt-input-wrapper">
           <textarea
-            className="scratchpad-input"
-            placeholder="Type symptoms in natural language... (e.g., 'grinding sound from front wheels when braking from 40 km/h, pedal sinks slightly')"
-            rows={4}
+            className="prompt-textarea"
+            placeholder="e.g. My car makes a metallic grinding noise when braking at low speeds, and the brake pedal feels a bit soft..."
+            rows={3}
             value={symptomInput}
             onChange={e => setSymptomInput(e.target.value)}
           />
-        </div>
 
-        <div className="card-footer-actions">
-          <button
-            className="coded-primary-btn"
-            onClick={() => handleStartAnalysis()}
-            disabled={!symptomInput.trim() || loading}
-          >
-            {loading ? 'RUNNING_DIAGNOSTIC_PIPELINE...' : 'RUN_ANALYSIS ↵'}
-          </button>
-          {(currentAssessment || isConsultationActive) && (
-            <button className="coded-ghost-btn" onClick={handleResetConsultation}>
-              RESET_SESSION [esc]
-            </button>
-          )}
+          <div className="prompt-bottom-bar">
+            <span className="prompt-hint">Natural language symptom processing · Deterministic safety triage</span>
+            <div className="prompt-actions">
+              {(currentAssessment || isConsultationActive) && (
+                <button className="btn-secondary" onClick={handleResetConsultation}>
+                  <RotateCcw size={14} />
+                  <span>Start Fresh</span>
+                </button>
+              )}
+              <button
+                className="btn-primary"
+                onClick={() => handleStartAnalysis()}
+                disabled={!symptomInput.trim() || loading}
+              >
+                <span>{loading ? 'Analyzing...' : 'Diagnose Symptoms'}</span>
+                <ArrowRight size={15} />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Step 2: Context-Aware Discriminating Follow-Ups */}
+      {/* Step 2: Context-Aware Follow-Up Questions */}
       {isConsultationActive && followUps.length > 0 && (
-        <div className="note-card followup-section">
-          <div className="card-section-header">
-            <span className="section-index alert">02</span>
-            <div>
-              <h3>Discriminating Test Questionnaire</h3>
-              <p className="section-desc">Answer key questions to eliminate confounding failure modes:</p>
-            </div>
+        <div className="followup-surface-card animate-fade-in">
+          <div className="followup-card-header">
+            <div className="step-badge">STEP 2 OF 2</div>
+            <h3>Targeted Discriminating Checks</h3>
+            <p>Our diagnostic engine identified key follow-up questions to isolate the root mechanical cause:</p>
           </div>
 
-          <div className="followup-questions-container">
-            {followUps.map((q, qIdx) => {
+          <div className="questions-grid">
+            {followUps.map((q, idx) => {
               const currentVal = followUpAnswers[q.id]
               return (
-                <div key={q.id} className="coded-question-block">
-                  <div className="q-header-row">
-                    <span className="q-badge">TEST #{qIdx + 1} // {q.targetSystem}</span>
-                    <h4 className="q-title">{q.question}</h4>
+                <div key={q.id} className="question-card">
+                  <div className="question-header">
+                    <span className="q-tag">{q.targetSystem} System</span>
+                    <h4 className="q-title">Q{idx + 1}. {q.question}</h4>
                   </div>
-                  <p className="q-context-callout">
-                    <span className="callout-icon">ℹ</span>
-                    {q.context}
-                  </p>
+                  <p className="q-desc">{q.context}</p>
 
-                  <div className="coded-options-grid">
-                    {q.options.map((opt, optIdx) => (
+                  <div className="options-stack">
+                    {q.options.map(opt => (
                       <button
                         key={opt.value}
-                        className={`coded-option-chip ${currentVal === opt.value ? 'selected' : ''}`}
+                        className={`option-tile ${currentVal === opt.value ? 'selected' : ''}`}
                         onClick={() => handleAnswerFollowUp(q.id, opt.value)}
                       >
-                        <div className="opt-key-badge">[{optIdx + 1}]</div>
-                        <div className="opt-text-wrap">
-                          <span className="opt-label">{opt.label}</span>
-                          {opt.hint && <span className="opt-sub">{opt.hint}</span>}
+                        <div className="option-tile-check">
+                          <CheckCircle2 size={16} />
+                        </div>
+                        <div className="option-tile-body">
+                          <span className="option-tile-label">{opt.label}</span>
+                          {opt.hint && <span className="option-tile-hint">{opt.hint}</span>}
                         </div>
                       </button>
                     ))}
@@ -322,50 +333,62 @@ export const DiagnoseView: React.FC<DiagnoseViewProps> = ({
             })}
           </div>
 
-          <div className="card-footer-actions right">
+          <div className="followup-footer">
             <button
-              className="coded-primary-btn large"
+              className="btn-primary large"
               onClick={() => executeDiagnosis(symptomInput, followUpAnswers)}
               disabled={loading}
             >
-              {loading ? 'COMPILING_LEDGER...' : 'GENERATE_DIAGNOSTIC_REPORT ↵'}
+              <span>{loading ? 'Compiling Comprehensive Assessment...' : 'Generate Diagnostic Report'}</span>
+              <ArrowRight size={16} />
             </button>
           </div>
         </div>
       )}
 
-      {/* Step 3: Completed Technical Assessment Ledger */}
+      {/* Step 3: Diagnostic Report View */}
       {currentAssessment && !isConsultationActive && (
-        <div className="note-card report-dossier-section">
-          {/* Critical Hazard Alert Callout */}
+        <div className="report-container animate-fade-in">
+          {/* Critical Safety Hazard Banner */}
           {currentAssessment.safety.requiresImmediateStop && (
-            <div className="hazard-callout-block">
-              <div className="hazard-callout-header">
-                <span className="hazard-symbol">⚡</span>
-                <div className="hazard-title-wrap">
-                  <span className="hazard-code-label">HAZARD_DIRECTIVE // CRITICAL_STOP_MANDATE</span>
-                  <h4>{currentAssessment.safety.matches.map(m => m.hazardName).join(' + ')}</h4>
+            <div className="safety-hazard-banner">
+              <div className="hazard-top">
+                <div className="hazard-icon-circle">
+                  <ShieldAlert size={26} />
+                </div>
+                <div>
+                  <div className="hazard-kicker">CRITICAL ROADSIDE SAFETY HAZARD</div>
+                  <h3 className="hazard-headline">
+                    {currentAssessment.safety.matches.map(m => m.hazardName).join(' · ')}
+                  </h3>
                 </div>
               </div>
 
-              <div className="hazard-instruction-box">
-                <p className="hazard-instruction-text">{currentAssessment.safety.summaryWarning}</p>
+              <div className="hazard-action-card">
+                <span className="action-tag">MANDATORY IMMEDIATE DIRECTIVE</span>
+                <p className="action-text">{currentAssessment.safety.summaryWarning}</p>
               </div>
 
-              <div className="hazard-checklist-grid">
-                <div className="checklist-col">
-                  <span className="col-title">[!] MANDATORY ACTION CHECKLIST:</span>
+              <div className="hazard-split-checklist">
+                <div className="hazard-list-col">
+                  <span className="list-col-header">EMERGENCY CHECKLIST:</span>
                   <ul>
                     {currentAssessment.safety.emergencyChecklist.map((item, idx) => (
-                      <li key={idx}><span className="bullet">■</span> {item}</li>
+                      <li key={idx}>
+                        <AlertTriangle size={14} className="icon-warn" />
+                        <span>{item}</span>
+                      </li>
                     ))}
                   </ul>
                 </div>
-                <div className="checklist-col danger">
-                  <span className="col-title">[✕] STRICTLY PROHIBITED ACTIONS:</span>
+                <div className="hazard-list-col danger">
+                  <span className="list-col-header">STRICTLY PROHIBITED ACTIONS:</span>
                   <ul>
                     {currentAssessment.safety.matches.flatMap(m => m.prohibitedActions).map((prohibited, idx) => (
-                      <li key={'p_' + idx}><span className="bullet">✕</span> {prohibited}</li>
+                      <li key={'p_' + idx}>
+                        <span className="prohibited-x">✕</span>
+                        <span>{prohibited}</span>
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -373,168 +396,191 @@ export const DiagnoseView: React.FC<DiagnoseViewProps> = ({
             </div>
           )}
 
-          {/* Assessment Report Header */}
-          <div className="report-entry-header">
-            <div className="entry-identity">
-              <span className="entry-tag">LEDGER_ID #{currentAssessment.id}</span>
-              <h3 className="entry-heading">Automotive Technical Finding</h3>
-              <blockquote className="entry-quote">
-                "{currentAssessment.symptomSummary}"
-              </blockquote>
+          {/* Report Top Meta Card */}
+          <div className="report-summary-card">
+            <div className="report-summary-left">
+              <div className="report-id-row">
+                <span className="id-badge">Report #{currentAssessment.id.slice(-6)}</span>
+                <span className="date-badge">
+                  {new Date(currentAssessment.timestamp).toLocaleTimeString('en-IN', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </span>
+                <span className="origin-badge">{currentAssessment.providerOrigin.replace('_', ' ')}</span>
+              </div>
+              <h2 className="report-heading">Automotive Diagnostic Assessment</h2>
+              <p className="reported-symptom-quote">"{currentAssessment.symptomSummary}"</p>
             </div>
 
-            <div className={`coded-urgency-stamp ${currentAssessment.safety.overallSeverity.toLowerCase()}`}>
-              <span className="stamp-label">RISK_RATING</span>
-              <span className="stamp-value">{currentAssessment.safety.overallSeverity.replace('_', ' ')}</span>
+            <div className={`urgency-pill ${currentAssessment.safety.overallSeverity.toLowerCase()}`}>
+              <span className="urgency-label">SAFETY URGENCY</span>
+              <span className="urgency-val">{currentAssessment.safety.overallSeverity.replace('_', ' ')}</span>
             </div>
           </div>
 
-          {/* Diff explanation banner if updated */}
+          {/* What Changed Banner */}
           {currentAssessment.whatChangedExplanation && (
-            <div className="diff-callout-block">
-              <span className="diff-pill">DIFF_APPLIED</span>
-              <span className="diff-text">{currentAssessment.whatChangedExplanation}</span>
+            <div className="what-changed-pill-banner">
+              <Sparkles size={16} className="sparkle-accent" />
+              <span>
+                <strong>Updated Assessment:</strong> {currentAssessment.whatChangedExplanation}
+              </span>
             </div>
           )}
 
-          {/* Potential Causes Table / Cards */}
-          <div className="ledger-section">
-            <div className="section-row-between">
-              <h4 className="section-title">
-                <span className="section-sym">§</span> Ranked Mechanical Hypotheses ({currentAssessment.potentialCauses.length})
-              </h4>
-              <button className="coded-link-btn" onClick={onOpenEvidenceExplorer}>
-                [↗ OPEN_EVIDENCE_EXPLORER]
+          {/* Probable Root Causes */}
+          <div className="report-block">
+            <div className="block-header-between">
+              <div>
+                <h3 className="block-title">Probable Root Causes ({currentAssessment.potentialCauses.length})</h3>
+                <p className="block-desc">Ranked hypotheses derived from mechatronic fault models and reported symptoms:</p>
+              </div>
+              <button className="btn-secondary small" onClick={onOpenEvidenceExplorer}>
+                <span>Inspect Evidence Explorer</span>
+                <ExternalLink size={13} />
               </button>
             </div>
 
-            <div className="causes-ledger-list">
+            <div className="causes-cards-stack">
               {currentAssessment.potentialCauses.map((cause, idx) => (
-                <div key={cause.id} className="cause-ledger-entry">
-                  <div className="cause-entry-top">
-                    <div className="cause-num-title">
-                      <span className="cause-index">0{idx + 1}</span>
-                      <span className="cause-system-tag">[{cause.systemCategory.toUpperCase()}]</span>
-                      <h5 className="cause-name">{cause.name}</h5>
+                <div key={cause.id} className="cause-card">
+                  <div className="cause-card-top">
+                    <div className="cause-ident">
+                      <span className="cause-num">0{idx + 1}</span>
+                      <span className="cause-cat-badge">{cause.systemCategory}</span>
+                      <h4 className="cause-title">{cause.name}</h4>
                     </div>
-                    <span className={`cause-confidence-pill ${cause.probability.toLowerCase()}`}>
-                      {cause.probability.toUpperCase()} // PROBABILITY
+                    <span className={`cause-prob-badge ${cause.probability.toLowerCase()}`}>
+                      <span className="prob-dot" />
+                      {cause.probability} Cause
                     </span>
                   </div>
 
-                  <p className="cause-body">{cause.reasoning}</p>
+                  <p className="cause-reasoning-text">{cause.reasoning}</p>
 
-                  <div className="cause-quick-evidence">
-                    <span className="ev-badge plus">
-                      <span className="ev-sign">+</span> {cause.evidence.supporting[0]}
-                    </span>
-                    <span className="ev-badge test">
-                      <span className="ev-sign">?</span> NEXT_TEST: {cause.evidence.discriminatingTest}
-                    </span>
+                  <div className="cause-evidence-chips">
+                    <div className="ev-chip supporting">
+                      <CheckCircle2 size={13} />
+                      <span>{cause.evidence.supporting[0]}</span>
+                    </div>
+                    <div className="ev-chip test">
+                      <HelpCircle size={13} />
+                      <span><strong>Next Test:</strong> {cause.evidence.discriminatingTest}</span>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Indian Aftermarket Cost Ledger */}
-          <div className="ledger-section">
-            <h4 className="section-title">
-              <span className="section-sym">₹</span> Financial Repair Estimate // Indian Aftermarket
-            </h4>
+          {/* Localized Indian Cost Estimator */}
+          <div className="report-block">
+            <div className="block-header-between">
+              <div>
+                <h3 className="block-title">Transparent Repair Cost Breakdown (Indian Market)</h3>
+                <p className="block-desc">Calculated for standard aftermarket and OEM replacement parts in Indian cities:</p>
+              </div>
+              <span className="confidence-tag">{currentAssessment.costEstimate.confidence.replace('_', ' ')}</span>
+            </div>
 
-            <div className="cost-ledger-table">
-              <div className="cost-ledger-row header">
-                <span>LINE_ITEM</span>
-                <span>ESTIMATED_MIN (₹)</span>
-                <span>ESTIMATED_MAX (₹)</span>
-              </div>
-              <div className="cost-ledger-row">
-                <span className="row-item">01. Replacement Hardware & OEM Components</span>
-                <span className="mono">₹{currentAssessment.costEstimate.partsMinINR.toLocaleString('en-IN')}</span>
-                <span className="mono">₹{currentAssessment.costEstimate.partsMaxINR.toLocaleString('en-IN')}</span>
-              </div>
-              <div className="cost-ledger-row">
-                <span className="row-item">02. Workshop Diagnostic & Mechanical Labor</span>
-                <span className="mono">₹{currentAssessment.costEstimate.laborMinINR.toLocaleString('en-IN')}</span>
-                <span className="mono">₹{currentAssessment.costEstimate.laborMaxINR.toLocaleString('en-IN')}</span>
-              </div>
-              <div className="cost-ledger-row total">
-                <span className="row-item">TOTAL ESTIMATED EXPENDITURE</span>
-                <span className="mono total">₹{currentAssessment.costEstimate.totalMinINR.toLocaleString('en-IN')}</span>
-                <span className="mono total">₹{currentAssessment.costEstimate.totalMaxINR.toLocaleString('en-IN')}</span>
+            <div className="cost-metrics-grid">
+              <div className="cost-metric-card">
+                <span className="cm-label">Estimated Parts</span>
+                <div className="cm-val">
+                  ₹{currentAssessment.costEstimate.partsMinINR.toLocaleString('en-IN')} – ₹{currentAssessment.costEstimate.partsMaxINR.toLocaleString('en-IN')}
+                </div>
+                <span className="cm-sub">OEM / Aftermarket Replacement</span>
               </div>
 
-              <div className="cost-ledger-footer">
-                <span className="bench-tag">CONFIDENCE: {currentAssessment.costEstimate.confidence.toUpperCase()}</span>
-                <span className="bench-notes">{currentAssessment.costEstimate.assumptions}</span>
+              <div className="cost-metric-card">
+                <span className="cm-label">Estimated Labor</span>
+                <div className="cm-val">
+                  ₹{currentAssessment.costEstimate.laborMinINR.toLocaleString('en-IN')} – ₹{currentAssessment.costEstimate.laborMaxINR.toLocaleString('en-IN')}
+                </div>
+                <span className="cm-sub">Workshop Diagnostic & Fitting</span>
               </div>
+
+              <div className="cost-metric-card total">
+                <span className="cm-label">Total Estimated Range</span>
+                <div className="cm-val total">
+                  ₹{currentAssessment.costEstimate.totalMinINR.toLocaleString('en-IN')} – ₹{currentAssessment.costEstimate.totalMaxINR.toLocaleString('en-IN')}
+                </div>
+                <span className="cm-sub">Taxes & Consumables Included</span>
+              </div>
+            </div>
+
+            <div className="cost-assumptions-strip">
+              <span>{currentAssessment.costEstimate.assumptions}</span>
+              <span className="source-label">Source: {currentAssessment.costEstimate.dataSource}</span>
             </div>
           </div>
 
-          {/* Inspection Protocols */}
-          <div className="inspection-ledger-grid">
-            <div className="inspection-card user">
-              <span className="card-sub-header">[USER_INSPECTION_CHECKLIST // NO TOOLS]</span>
-              <ul>
+          {/* Safe DIY vs Workshop Split */}
+          <div className="inspection-double-grid">
+            <div className="inspection-panel user-diy">
+              <div className="ip-header">
+                <CheckCircle2 size={16} className="ip-icon user" />
+                <h4>Safe DIY Checkpoints (No Tools)</h4>
+              </div>
+              <ul className="ip-list">
                 {currentAssessment.potentialCauses.map((c, i) => (
                   <li key={i}>
-                    <span className="check-box">[✓]</span>
-                    <span className="check-text"><strong>{c.name}:</strong> {c.safeUserInspection}</span>
+                    <strong>{c.name}:</strong> {c.safeUserInspection}
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="inspection-card mechanic">
-              <span className="card-sub-header">[WORKSHOP_VERIFICATION_SPEC // TECH ONLY]</span>
-              <ul>
+            <div className="inspection-panel workshop-tech">
+              <div className="ip-header">
+                <Wrench size={16} className="ip-icon tech" />
+                <h4>Certified Workshop Procedures</h4>
+              </div>
+              <ul className="ip-list">
                 {currentAssessment.potentialCauses.flatMap(c => c.professionalMechanicSteps).slice(0, 4).map((step, i) => (
-                  <li key={i}>
-                    <span className="check-box">[⚙]</span>
-                    <span className="check-text">{step}</span>
-                  </li>
+                  <li key={i}>{step}</li>
                 ))}
               </ul>
             </div>
           </div>
 
-          {/* Limitations */}
-          <div className="limitations-callout">
-            <span className="lim-header">// MODEL_LIMITATIONS & SCIENTIFIC_UNCERTAINTY:</span>
+          {/* Scientific Limitations & Uncertainty */}
+          <div className="limitations-surface">
+            <h4>Assessment Limitations & Scientific Uncertainty</h4>
             <ul>
               {currentAssessment.limitations.map((lim, idx) => (
-                <li key={idx}>• {lim}</li>
+                <li key={idx}>{lim}</li>
               ))}
             </ul>
           </div>
 
-          {/* Interactive Note Scratchpad / Consultation Thread */}
-          <div className="interactive-scratchpad-block">
-            <div className="scratchpad-header">
-              <span className="terminal-prompt">$</span>
-              <h4>Interactive Consultation Scratchpad</h4>
+          {/* Interactive Clarification Scratchpad */}
+          <div className="interactive-qa-surface">
+            <div className="qa-header">
+              <Sparkles size={16} className="qa-sparkle-icon" />
+              <div>
+                <h4>Have questions about this assessment?</h4>
+                <p>Ask for simpler explanations, inquire about specific components, or report another symptom:</p>
+              </div>
             </div>
-            <p className="scratchpad-sub">
-              Ask clarifying questions, request simplified explanations, or type newly observed symptoms to update this case:
-            </p>
 
             {chatMessages.length > 0 && (
-              <div className="chat-thread-container">
+              <div className="chat-thread-box">
                 {chatMessages.map((msg, i) => (
-                  <div key={i} className={`chat-line ${msg.role}`}>
-                    <span className="line-prefix">{msg.role === 'user' ? 'USER >' : 'MECH >'}</span>
-                    <span className="line-content">{msg.text}</span>
+                  <div key={i} className={`chat-bubble ${msg.role}`}>
+                    <span className="chat-sender">{msg.role === 'user' ? 'You' : 'MechMate'}</span>
+                    <p>{msg.text}</p>
                   </div>
                 ))}
               </div>
             )}
 
-            <div className="scratchpad-input-row">
+            <div className="qa-input-wrapper">
               <input
                 type="text"
-                className="coded-text-input"
-                placeholder="Type query or newly emerged symptom... (e.g. 'Also noticed burning smell from front left')"
+                className="qa-text-input"
+                placeholder="Ask a clarifying question or report a newly observed symptom..."
                 value={chatInput}
                 onChange={e => setChatInput(e.target.value)}
                 onKeyDown={e => {
@@ -543,11 +589,12 @@ export const DiagnoseView: React.FC<DiagnoseViewProps> = ({
                 disabled={chatLoading}
               />
               <button
-                className="coded-send-btn"
+                className="qa-send-btn"
                 onClick={handleSendChatMessage}
                 disabled={!chatInput.trim() || chatLoading}
               >
-                {chatLoading ? 'QUERYING...' : 'SEND ↵'}
+                <Send size={15} />
+                <span>{chatLoading ? 'Consulting...' : 'Ask'}</span>
               </button>
             </div>
           </div>

@@ -1,6 +1,18 @@
 import React, { useState } from 'react'
 import { MaintenanceItem, VehicleProfile } from '../types/automotive'
 import { evaluateMaintenanceStatus } from '../services/maintenanceService'
+import {
+  CalendarCheck,
+  AlertTriangle,
+  Clock,
+  CheckCircle2,
+  Gauge,
+  Wrench,
+  Car,
+  ArrowRight,
+  X,
+  ShieldCheck
+} from 'lucide-react'
 
 interface MaintenanceViewProps {
   activeVehicle: VehicleProfile | null
@@ -25,16 +37,19 @@ export const MaintenanceView: React.FC<MaintenanceViewProps> = ({
 
   if (!activeVehicle) {
     return (
-      <div className="view-container note-page-layout">
-        <div className="note-empty-card">
-          <span className="empty-symbol">[!]</span>
-          <h3>Vehicle Target Unassigned</h3>
+      <div className="view-container">
+        <div className="empty-state-card">
+          <div className="empty-icon-wrap">
+            <Car size={32} />
+          </div>
+          <h3>No Active Vehicle Selected</h3>
           <p>
-            Maintenance schedules calculate interval wear from vehicle fuel type, transmission, and odometer readings.
-            Select an active car from your garage to access calibrated service timelines.
+            Maintenance schedules calculate wear cycles based on your vehicle's engine, transmission,
+            and current odometer reading. Select or add a vehicle in your garage to view calibrated service milestones.
           </p>
-          <button className="coded-primary-btn" onClick={onOpenGarage}>
-            OPEN_GARAGE_REGISTRY ↵
+          <button className="btn-primary" onClick={onOpenGarage}>
+            <span>Open Garage</span>
+            <ArrowRight size={16} />
           </button>
         </div>
       </div>
@@ -59,96 +74,133 @@ export const MaintenanceView: React.FC<MaintenanceViewProps> = ({
     }
   }
 
+  const selectedItemForModal = evaluatedItems.find(i => i.id === completeModalItemId)
+
   return (
-    <div className="view-container note-page-layout">
-      {/* Dossier Header */}
-      <div className="note-dossier-header">
-        <div className="dossier-meta-strip">
-          <span className="mono-badge">LOG // SERVICE_PLANNER</span>
-          <span className="meta-divider">/</span>
-          <span className="mono-text">SPEC: INDIAN_TROPICAL_MAINTENANCE</span>
-          <span className="meta-divider">/</span>
-          <span className="mono-text">CYCLE: 10,000KM_STANDARD</span>
+    <div className="view-container">
+      {/* View Header */}
+      <div className="view-header">
+        <div className="view-meta-pill">
+          <CalendarCheck className="meta-icon" size={13} />
+          <span>Preventative Maintenance</span>
+          <span className="meta-dot">•</span>
+          <span>Indian Tropical & Urban Wear Profile</span>
         </div>
 
-        <div className="dossier-title-group">
-          <h2 className="dossier-title">Preventative Service Ledger</h2>
-          <p className="dossier-sub">
-            Calibrated maintenance milestones for {activeVehicle.year} {activeVehicle.make} {activeVehicle.model} ({activeVehicle.odometerKm.toLocaleString('en-IN')} km).
-            Adapted for Indian dust, urban stop-and-go traffic, and tropical humidity.
-          </p>
+        <h1 className="view-title">Service Schedule Ledger</h1>
+        <p className="view-subtitle">
+          Calibrated service milestones for your <strong>{activeVehicle.year} {activeVehicle.make} {activeVehicle.model}</strong> ({activeVehicle.odometerKm.toLocaleString('en-IN')} km).
+          Adapted for Indian dust conditions, frequent stop-and-go commuting, and monsoon humidity.
+        </p>
+      </div>
+
+      {/* Telemetry Stat Cards Grid */}
+      <div className="telemetry-grid">
+        <div className="telemetry-card">
+          <div className="telemetry-header">
+            <span className="telemetry-label">Current Odometer</span>
+            <Gauge size={16} className="text-muted" />
+          </div>
+          <div className="telemetry-number">
+            {activeVehicle.odometerKm.toLocaleString('en-IN')} <span className="telemetry-unit">km</span>
+          </div>
+        </div>
+
+        <div className={`telemetry-card ${dueCount > 0 ? 'critical-border' : ''}`}>
+          <div className="telemetry-header">
+            <span className="telemetry-label">Overdue Milestones</span>
+            <AlertTriangle size={16} className={dueCount > 0 ? 'text-danger' : 'text-muted'} />
+          </div>
+          <div className={`telemetry-number ${dueCount > 0 ? 'text-danger' : ''}`}>
+            {dueCount}
+          </div>
+        </div>
+
+        <div className="telemetry-card">
+          <div className="telemetry-header">
+            <span className="telemetry-label">Due Soon (&lt;2,000 km)</span>
+            <Clock size={16} className="text-warning" />
+          </div>
+          <div className="telemetry-number text-warning">
+            {upcomingCount}
+          </div>
+        </div>
+
+        <div className="telemetry-card">
+          <div className="telemetry-header">
+            <span className="telemetry-label">Verified Healthy</span>
+            <CheckCircle2 size={16} className="text-success" />
+          </div>
+          <div className="telemetry-number text-success">
+            {healthyCount}
+          </div>
         </div>
       </div>
 
-      {/* Coded Telemetry Stats Ribbon */}
-      <div className="coded-telemetry-ribbon">
-        <div className="telemetry-cell">
-          <span className="cell-label">CURRENT_ODOMETER</span>
-          <span className="cell-value">{activeVehicle.odometerKm.toLocaleString('en-IN')} KM</span>
-        </div>
-        <div className={`telemetry-cell ${dueCount > 0 ? 'critical' : ''}`}>
-          <span className="cell-label">OVERDUE_MILESTONES</span>
-          <span className="cell-value">{dueCount}</span>
-        </div>
-        <div className="telemetry-cell">
-          <span className="cell-label">UPCOMING_SOON</span>
-          <span className="cell-value">{upcomingCount}</span>
-        </div>
-        <div className="telemetry-cell">
-          <span className="cell-label">VERIFIED_HEALTHY</span>
-          <span className="cell-value">{healthyCount}</span>
-        </div>
-      </div>
-
-      {/* Maintenance Service Cards List */}
-      <div className="service-ledger-list">
+      {/* Service Schedule List */}
+      <div className="service-list">
         {evaluatedItems.map((item, idx) => {
           return (
-            <div key={item.id} className={`service-item-row ${item.status.toLowerCase()}`}>
-              <div className="service-row-left">
-                <div className="service-header-line">
-                  <span className="service-idx">0{idx + 1}.</span>
-                  <span className="service-sys-tag">[{item.systemCategory.toUpperCase()}]</span>
-                  <h4 className="service-title">{item.title}</h4>
-                  <span className={`service-status-pill ${item.status.toLowerCase()}`}>
-                    {item.status === 'DUE' && 'OVERDUE // IMMEDIATE'}
-                    {item.status === 'UPCOMING' && 'DUE_SOON // <2000KM'}
-                    {item.status === 'HEALTHY' && 'HEALTHY // VERIFIED'}
-                  </span>
+            <div key={item.id} className={`service-card ${item.status.toLowerCase()}`}>
+              <div className="service-card-main">
+                <div className="service-card-header">
+                  <div className="service-badge-group">
+                    <span className="service-idx">#{idx + 1}</span>
+                    <span className="service-subsystem-tag">{item.systemCategory}</span>
+                    <span className={`badge-status ${item.status.toLowerCase()}`}>
+                      {item.status === 'DUE' && 'Overdue // Immediate'}
+                      {item.status === 'UPCOMING' && 'Due Soon // Next 2,000 km'}
+                      {item.status === 'HEALTHY' && 'Optimal // Within Interval'}
+                    </span>
+                  </div>
+                  <h3 className="service-title">{item.title}</h3>
                 </div>
 
-                <p className="service-note-text">{item.recommendationNote}</p>
+                <p className="service-description">{item.recommendationNote}</p>
 
-                <div className="service-meta-line">
-                  <span>INTERVAL: Every {item.intervalKm.toLocaleString('en-IN')} km / {item.intervalMonths} mo</span>
+                <div className="service-meta-badges">
+                  <span className="meta-badge">
+                    <Clock size={12} />
+                    <span>Interval: Every {item.intervalKm.toLocaleString('en-IN')} km / {item.intervalMonths} mo</span>
+                  </span>
                   {item.lastCompletedKm !== undefined && (
-                    <span>PREVIOUS: {item.lastCompletedKm.toLocaleString('en-IN')} km</span>
+                    <span className="meta-badge">
+                      <CheckCircle2 size={12} />
+                      <span>Last done at: {item.lastCompletedKm.toLocaleString('en-IN')} km</span>
+                    </span>
                   )}
                   {item.lastCompletedDate && (
-                    <span>DATE: {item.lastCompletedDate}</span>
+                    <span className="meta-badge">
+                      <CalendarCheck size={12} />
+                      <span>Date: {item.lastCompletedDate}</span>
+                    </span>
                   )}
                 </div>
               </div>
 
-              <div className="service-row-right">
-                <div className="service-progress-container">
-                  <div className="service-meter-bar">
+              <div className="service-card-side">
+                <div className="service-progress-box">
+                  <div className="progress-label-row">
+                    <span>Interval Elapsed</span>
+                    <span className="progress-val">{item.progressPercent}%</span>
+                  </div>
+                  <div className="progress-bar-bg">
                     <div
-                      className={`service-meter-fill ${item.status.toLowerCase()}`}
+                      className={`progress-bar-fill ${item.status.toLowerCase()}`}
                       style={{ width: `${item.progressPercent}%` }}
                     />
                   </div>
-                  <span className="meter-label">{item.progressPercent}% INTERVAL ELAPSED</span>
                 </div>
 
                 <button
-                  className="coded-log-btn"
+                  className="btn-secondary small"
                   onClick={() => {
                     setCompleteModalItemId(item.id)
                     setCompleteKm(activeVehicle.odometerKm)
                   }}
                 >
-                  [LOG_SERVICE ↵]
+                  <Wrench size={13} />
+                  <span>Log Service</span>
                 </button>
               </div>
             </div>
@@ -158,51 +210,61 @@ export const MaintenanceView: React.FC<MaintenanceViewProps> = ({
 
       {/* Log Service Modal */}
       {completeModalItemId && (
-        <div className="modal-overlay">
-          <div className="coded-modal-card">
-            <div className="modal-header-strip">
-              <span className="modal-badge">SERVICE_LOG // CONFIRMATION</span>
-              <button className="modal-x-btn" onClick={() => setCompleteModalItemId(null)}>[esc]</button>
+        <div className="modal-backdrop">
+          <div className="modal-card">
+            <div className="modal-header">
+              <div className="modal-title-group">
+                <Wrench className="text-amber" size={20} />
+                <h3>Log Service Completion</h3>
+              </div>
+              <button className="btn-icon" onClick={() => setCompleteModalItemId(null)}>
+                <X size={18} />
+              </button>
             </div>
 
-            <div className="modal-title-wrap">
-              <h3>Log Maintenance Completion</h3>
-              <p>Record service completion date and odometer to reset milestone interval:</p>
-            </div>
+            <p className="modal-description">
+              Recording service resets the wear interval counter for:
+              <br />
+              <strong className="text-amber">{selectedItemForModal?.title}</strong>
+            </p>
 
-            <div className="coded-modal-form">
-              <div className="form-field">
-                <label>ODOMETER AT SERVICE (KM) *</label>
+            <div className="modal-form">
+              <div className="form-group">
+                <label>Odometer at Service (km) *</label>
                 <input
                   type="number"
                   value={completeKm}
                   onChange={e => setCompleteKm(parseInt(e.target.value, 10) || 0)}
+                  min={0}
+                  required
                 />
               </div>
 
-              <div className="form-field">
-                <label>DATE OF COMPLETION *</label>
+              <div className="form-group">
+                <label>Service Date *</label>
                 <input
                   type="date"
                   value={completeDate}
                   onChange={e => setCompleteDate(e.target.value)}
+                  required
                 />
               </div>
 
-              <div className="modal-footer-actions">
+              <div className="modal-actions">
                 <button
                   type="button"
-                  className="coded-ghost-btn"
+                  className="btn-secondary"
                   onClick={() => setCompleteModalItemId(null)}
                 >
-                  CANCEL
+                  Cancel
                 </button>
                 <button
                   type="button"
-                  className="coded-primary-btn"
+                  className="btn-primary"
                   onClick={handleConfirmCompletion}
                 >
-                  COMMIT_SERVICE_LOG ↵
+                  <ShieldCheck size={16} />
+                  <span>Record & Reset Interval</span>
                 </button>
               </div>
             </div>

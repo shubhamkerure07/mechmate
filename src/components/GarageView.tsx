@@ -1,5 +1,17 @@
 import React, { useState } from 'react'
 import { FuelType, TransmissionType, VehicleProfile } from '../types/automotive'
+import {
+  Car,
+  Plus,
+  Edit3,
+  Check,
+  X,
+  Trash2,
+  MapPin,
+  Gauge,
+  Zap,
+  ShieldCheck
+} from 'lucide-react'
 
 interface GarageViewProps {
   vehicles: VehicleProfile[]
@@ -78,133 +90,163 @@ export const GarageView: React.FC<GarageViewProps> = ({
   }
 
   return (
-    <div className="view-container note-page-layout">
-      {/* Dossier Header */}
-      <div className="note-dossier-header flex-between">
+    <div className="view-container">
+      {/* View Header */}
+      <div className="view-header flex-between">
         <div>
-          <div className="dossier-meta-strip">
-            <span className="mono-badge">REGISTRY // VEHICLE_GARAGE</span>
-            <span className="meta-divider">/</span>
-            <span className="mono-text">LOCAL_VAULT: ENCRYPTED_AT_REST</span>
-            <span className="meta-divider">/</span>
-            <span className="mono-text">ENTRIES: {vehicles.length}</span>
+          <div className="view-meta-pill">
+            <Car className="meta-icon" size={13} />
+            <span>Vehicle Fleet Registry</span>
+            <span className="meta-dot">•</span>
+            <span>{vehicles.length} {vehicles.length === 1 ? 'Vehicle' : 'Vehicles'} Registered</span>
           </div>
 
-          <div className="dossier-title-group">
-            <h2 className="dossier-title">Fleet Manifest & Vehicle Registry</h2>
-            <p className="dossier-sub">
-              Manage your vehicles, specs, and odometer logs. All diagnostic assessments, maintenance intervals,
-              and parts replacement estimates calibrate to the selected active vehicle.
-            </p>
-          </div>
+          <h1 className="view-title">My Garage</h1>
+          <p className="view-subtitle">
+            Manage your vehicles and odometer readings. Diagnostic assessments, maintenance schedules,
+            and repair expense estimates calibrate dynamically to your active car.
+          </p>
         </div>
 
-        <button
-          className="coded-primary-btn"
-          onClick={() => setShowAddModal(true)}
-        >
-          + ADD_VEHICLE [N]
+        <button className="btn-primary" onClick={() => setShowAddModal(true)}>
+          <Plus size={16} />
+          <span>Add Vehicle</span>
         </button>
       </div>
 
       {vehicles.length === 0 ? (
-        <div className="note-empty-card">
-          <span className="empty-symbol">[∅]</span>
-          <h3>Vehicle Registry Empty</h3>
+        <div className="empty-state-card">
+          <div className="empty-icon-wrap">
+            <Car size={32} />
+          </div>
+          <h3>Your Garage is Empty</h3>
           <p>
-            Add your car profile to calibrate maintenance intervals, estimate localized repair costs in ₹,
-            and associate diagnostic consultation notes.
+            Enroll your vehicle profile to calibrate maintenance milestones, estimate realistic repair costs in ₹,
+            and personalize diagnostic workflows.
           </p>
           <div className="empty-actions-row">
-            <button className="coded-primary-btn" onClick={() => setShowAddModal(true)}>
-              + ENROLL_FIRST_VEHICLE
+            <button className="btn-primary" onClick={() => setShowAddModal(true)}>
+              <Plus size={16} />
+              <span>Enroll First Vehicle</span>
             </button>
-            <button className="coded-ghost-btn" onClick={onStartDiagnosis}>
-              RUN_GENERIC_DIAGNOSIS ↵
+            <button className="btn-secondary" onClick={onStartDiagnosis}>
+              <span>Run Generic Diagnosis</span>
             </button>
           </div>
         </div>
       ) : (
-        <div className="garage-manifest-grid">
+        <div className="fleet-grid">
           {vehicles.map(v => {
             const isActive = v.id === activeVehicleId
             const isEditingThisOdo = editingOdoId === v.id
 
             return (
-              <div key={v.id} className={`vehicle-manifest-card ${isActive ? 'active' : ''}`}>
-                <div className="manifest-top-bar">
-                  <div className="manifest-tags-row">
-                    <span className="car-spec-tag year">{v.year}</span>
-                    <span className="car-spec-tag fuel">{v.fuelType.toUpperCase()}</span>
-                    <span className="car-spec-tag trans">{v.transmission.toUpperCase()}</span>
+              <div key={v.id} className={`vehicle-card ${isActive ? 'active' : ''}`}>
+                <div className="vehicle-card-top">
+                  <div className="vehicle-specs-pills">
+                    <span className="spec-pill">{v.year}</span>
+                    <span className="spec-pill">{v.fuelType}</span>
+                    <span className="spec-pill">{v.transmission}</span>
                   </div>
-                  {isActive && <span className="active-car-stamp">ACTIVE // TARGET_SPEC</span>}
+                  {isActive ? (
+                    <span className="active-badge">
+                      <span className="active-dot" />
+                      Active Target
+                    </span>
+                  ) : null}
                 </div>
 
-                <div className="manifest-identity">
-                  <h3 className="manifest-title">{v.make} {v.model}</h3>
-                  <span className="manifest-region">LOC: {v.region}</span>
+                <div className="vehicle-main-info">
+                  <div className="vehicle-avatar">
+                    <Car size={24} />
+                  </div>
+                  <div>
+                    <h3 className="vehicle-title">{v.make} {v.model}</h3>
+                    <div className="vehicle-meta-line">
+                      <MapPin size={13} />
+                      <span>{v.region}</span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Odometer Terminal Editor */}
-                <div className="manifest-odometer-box">
-                  <span className="odo-meta-key">ODOMETER_LOG:</span>
+                {/* Odometer Tracker */}
+                <div className="vehicle-odometer-box">
+                  <div className="odo-label">
+                    <Gauge size={14} />
+                    <span>Current Odometer</span>
+                  </div>
+
                   {isEditingThisOdo ? (
-                    <div className="odo-inline-editor">
+                    <div className="odo-edit-form">
                       <input
                         type="number"
-                        className="odo-code-input"
+                        className="input-odometer"
                         value={tempOdo}
                         onChange={e => setTempOdo(e.target.value)}
                         autoFocus
                       />
-                      <button className="odo-save-btn" onClick={() => handleSaveOdometer(v)}>✓</button>
-                      <button className="odo-cancel-btn" onClick={() => setEditingOdoId(null)}>✕</button>
+                      <button
+                        className="btn-icon check"
+                        onClick={() => handleSaveOdometer(v)}
+                        title="Save Odometer"
+                      >
+                        <Check size={14} />
+                      </button>
+                      <button
+                        className="btn-icon cancel"
+                        onClick={() => setEditingOdoId(null)}
+                        title="Cancel"
+                      >
+                        <X size={14} />
+                      </button>
                     </div>
                   ) : (
-                    <div className="odo-value-display">
-                      <span className="odo-number">{v.odometerKm.toLocaleString('en-IN')} KM</span>
+                    <div className="odo-display-row">
+                      <span className="odo-value">{v.odometerKm.toLocaleString('en-IN')} km</span>
                       <button
-                        className="odo-pencil-btn"
+                        className="btn-icon edit"
                         onClick={() => {
                           setEditingOdoId(v.id)
                           setTempOdo(v.odometerKm.toString())
                         }}
-                        title="Update Odometer"
+                        title="Edit Odometer"
                       >
-                        [edit]
+                        <Edit3 size={13} />
                       </button>
                     </div>
                   )}
                 </div>
 
-                {/* Manifest Actions */}
-                <div className="manifest-card-actions">
+                {/* Card Actions */}
+                <div className="vehicle-card-actions">
                   {!isActive ? (
                     <button
-                      className="coded-secondary-btn small"
+                      className="btn-secondary small"
                       onClick={() => onSetActiveVehicle(v.id)}
                     >
-                      SET_ACTIVE
+                      <Check size={14} />
+                      <span>Set as Active</span>
                     </button>
                   ) : (
                     <button
-                      className="coded-primary-btn small"
+                      className="btn-primary small"
                       onClick={onStartDiagnosis}
                     >
-                      ⚡ DIAGNOSE_VEHICLE
+                      <Zap size={14} />
+                      <span>Diagnose Vehicle</span>
                     </button>
                   )}
+
                   <button
-                    className="coded-delete-btn"
+                    className="btn-icon delete"
                     onClick={() => {
-                      if (confirm(`Remove ${v.year} ${v.make} ${v.model} from your registry?`)) {
+                      if (confirm(`Remove ${v.year} ${v.make} ${v.model} from your garage?`)) {
                         onDeleteVehicle(v.id)
                       }
                     }}
-                    title="Delete Vehicle"
+                    title="Remove Vehicle"
                   >
-                    [delete]
+                    <Trash2 size={14} />
                   </button>
                 </div>
               </div>
@@ -213,48 +255,56 @@ export const GarageView: React.FC<GarageViewProps> = ({
         </div>
       )}
 
-      {/* Add Vehicle Modal / Config Editor */}
+      {/* Add Vehicle Modal */}
       {showAddModal && (
-        <div className="modal-overlay">
-          <div className="coded-modal-card">
-            <div className="modal-header-strip">
-              <span className="modal-badge">SCHEMA // VEHICLE_CONFIG</span>
-              <button className="modal-x-btn" onClick={() => setShowAddModal(false)}>[esc]</button>
+        <div className="modal-backdrop">
+          <div className="modal-card">
+            <div className="modal-header">
+              <div className="modal-title-group">
+                <Car className="text-amber" size={20} />
+                <h3>Enroll Vehicle in Garage</h3>
+              </div>
+              <button className="btn-icon" onClick={() => setShowAddModal(false)}>
+                <X size={18} />
+              </button>
             </div>
 
-            <div className="modal-title-wrap">
-              <h3>Enroll Vehicle in Local Garage</h3>
-              <p>Configure make, powertrain, and initial odometer reading for calibrated diagnostics:</p>
-            </div>
+            <p className="modal-description">
+              Provide vehicle specifications to calibrate diagnostic algorithms and maintenance schedules.
+            </p>
 
-            <form onSubmit={handleCreateVehicle} className="coded-modal-form">
-              {formError && <div className="form-error-callout">⚠️ {formError}</div>}
+            <form onSubmit={handleCreateVehicle} className="modal-form">
+              {formError && (
+                <div className="form-error-banner">
+                  <span>{formError}</span>
+                </div>
+              )}
 
-              <div className="coded-form-grid">
-                <div className="form-field">
-                  <label>MANUFACTURER / MAKE *</label>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Make / Manufacturer *</label>
                   <input
                     type="text"
-                    placeholder="e.g. Maruti Suzuki, Tata, Hyundai"
+                    placeholder="e.g. Maruti Suzuki, Tata, Hyundai, Honda"
                     value={make}
                     onChange={e => setMake(e.target.value)}
                     required
                   />
                 </div>
 
-                <div className="form-field">
-                  <label>MODEL NAME *</label>
+                <div className="form-group">
+                  <label>Model Name *</label>
                   <input
                     type="text"
-                    placeholder="e.g. Swift, Nexon, Creta, City"
+                    placeholder="e.g. Swift, Nexon, Creta, City, Thar"
                     value={model}
                     onChange={e => setModel(e.target.value)}
                     required
                   />
                 </div>
 
-                <div className="form-field">
-                  <label>MANUFACTURING YEAR *</label>
+                <div className="form-group">
+                  <label>Manufacturing Year *</label>
                   <input
                     type="number"
                     min={1980}
@@ -265,8 +315,8 @@ export const GarageView: React.FC<GarageViewProps> = ({
                   />
                 </div>
 
-                <div className="form-field">
-                  <label>FUEL VARIANT *</label>
+                <div className="form-group">
+                  <label>Fuel Type *</label>
                   <select
                     value={fuelType}
                     onChange={e => setFuelType(e.target.value as FuelType)}
@@ -279,8 +329,8 @@ export const GarageView: React.FC<GarageViewProps> = ({
                   </select>
                 </div>
 
-                <div className="form-field">
-                  <label>TRANSMISSION *</label>
+                <div className="form-group">
+                  <label>Transmission *</label>
                   <select
                     value={transmission}
                     onChange={e => setTransmission(e.target.value as TransmissionType)}
@@ -293,8 +343,8 @@ export const GarageView: React.FC<GarageViewProps> = ({
                   </select>
                 </div>
 
-                <div className="form-field">
-                  <label>INITIAL ODOMETER (KM) *</label>
+                <div className="form-group">
+                  <label>Current Odometer (km) *</label>
                   <input
                     type="number"
                     min={0}
@@ -304,27 +354,28 @@ export const GarageView: React.FC<GarageViewProps> = ({
                   />
                 </div>
 
-                <div className="form-field full-width">
-                  <label>REGION / CITY (INDIA)</label>
+                <div className="form-group full-width">
+                  <label>Operating Region / City</label>
                   <input
                     type="text"
-                    placeholder="e.g. Bengaluru, Karnataka or Mumbai, MH"
+                    placeholder="e.g. Bengaluru, Karnataka or Mumbai, Maharashtra"
                     value={region}
                     onChange={e => setRegion(e.target.value)}
                   />
                 </div>
               </div>
 
-              <div className="modal-footer-actions">
+              <div className="modal-actions">
                 <button
                   type="button"
-                  className="coded-ghost-btn"
+                  className="btn-secondary"
                   onClick={() => setShowAddModal(false)}
                 >
-                  CANCEL
+                  Cancel
                 </button>
-                <button type="submit" className="coded-primary-btn">
-                  SAVE_VEHICLE_RECORD ↵
+                <button type="submit" className="btn-primary">
+                  <ShieldCheck size={16} />
+                  <span>Save Vehicle</span>
                 </button>
               </div>
             </form>

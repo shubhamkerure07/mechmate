@@ -1,5 +1,18 @@
 import React, { useState } from 'react'
 import { DiagnosticAssessment, PotentialCause } from '../types/automotive'
+import {
+  FileSearch,
+  CheckCircle2,
+  XCircle,
+  HelpCircle,
+  Zap,
+  Wrench,
+  ShieldCheck,
+  FileText,
+  Sparkles,
+  ArrowRight,
+  Layers
+} from 'lucide-react'
 
 interface EvidenceExplorerProps {
   currentAssessment: DiagnosticAssessment | null
@@ -18,172 +31,199 @@ export const EvidenceExplorerView: React.FC<EvidenceExplorerProps> = ({
   const activeCause = causes.find(c => c.id === selectedCauseId) || causes[0] || null
 
   return (
-    <div className="view-container note-page-layout">
+    <div className="view-container">
       {/* Dossier Header */}
-      <div className="note-dossier-header">
-        <div className="dossier-meta-strip">
-          <span className="mono-badge">MODULE // EVIDENCE_EXPLORER</span>
-          <span className="meta-divider">/</span>
-          <span className="mono-text">METHOD: GOAL_BACKWARD_REASONING</span>
-          <span className="meta-divider">/</span>
-          <span className="mono-text">ISO: MECHATRONIC_AUDIT</span>
+      <div className="view-header">
+        <div className="view-meta-pill">
+          <Layers className="meta-icon" size={13} />
+          <span>Diagnostic Evidence Explorer</span>
+          <span className="meta-dot">•</span>
+          <span>Goal-Backward Forensic Analysis</span>
         </div>
 
-        <div className="dossier-title-group">
-          <h2 className="dossier-title">Forensic Diagnostic Evidence Explorer</h2>
-          <p className="dossier-sub">
-            Investigate how MechMate constructs its diagnostic hypothesis ledger: inspect supporting vs. contradicting evidence,
-            identify missing physical telemetry, and execute discriminating tests to confirm root cause without blind component swapping.
-          </p>
-        </div>
+        <h1 className="view-title">Forensic Hypothesis Ledger</h1>
+        <p className="view-subtitle">
+          Inspect how MechMate evaluates potential vehicle faults: review supporting vs. contradicting evidence,
+          identify missing physical telemetry, and execute discriminating tests to confirm root cause without blind component swapping.
+        </p>
       </div>
 
       {!activeCause ? (
-        <div className="note-empty-card">
-          <span className="empty-symbol">[?]</span>
-          <h3>No Active Case Loaded in Diagnostic Ledger</h3>
+        <div className="empty-state-card">
+          <div className="empty-icon-wrap">
+            <FileSearch size={32} />
+          </div>
+          <h3>No Active Diagnostic Case Loaded</h3>
           <p>
-            Run an intake consultation first to generate forensic evidence cards for your vehicle's observed symptoms.
+            Run an intake consultation first to generate forensic evidence cards and hypothesis evaluations for your vehicle's observed symptoms.
           </p>
-          <button className="coded-primary-btn" onClick={onOpenDiagnose}>
-            START_DIAGNOSTIC_INTAKE ↵
+          <button className="btn-primary" onClick={onOpenDiagnose}>
+            <Sparkles size={16} />
+            <span>Start Diagnostic Intake</span>
+            <ArrowRight size={16} />
           </button>
         </div>
       ) : (
-        <div className="evidence-dossier-wrapper">
-          {/* File Tab Selector */}
-          <div className="evidence-tabs-bar">
-            <span className="tabs-bar-label">// EVALUATED_HYPOTHESES:</span>
-            <div className="evidence-tab-scroll">
-              {causes.map((c, idx) => (
-                <button
-                  key={c.id}
-                  className={`evidence-file-tab ${c.id === activeCause.id ? 'active' : ''}`}
-                  onClick={() => setSelectedCauseId(c.id)}
-                >
-                  <span className="tab-file-icon">📄</span>
-                  <span className="tab-idx-tag">0{idx + 1}.</span>
-                  <span className="tab-cause-name">{c.name}</span>
-                  <span className={`tab-prob-tag ${c.probability.toLowerCase()}`}>
-                    [{c.probability.toUpperCase()}]
-                  </span>
-                </button>
-              ))}
+        <div className="evidence-layout">
+          {/* Hypotheses Selector Bar */}
+          <div className="evidence-selector-bar">
+            <div className="selector-label">
+              <FileText size={14} />
+              <span>Evaluated Hypotheses ({causes.length})</span>
+            </div>
+            <div className="hypothesis-tabs-scroll">
+              {causes.map((c, idx) => {
+                const isSelected = c.id === activeCause.id
+                return (
+                  <button
+                    key={c.id}
+                    className={`hypothesis-tab-btn ${isSelected ? 'active' : ''}`}
+                    onClick={() => setSelectedCauseId(c.id)}
+                  >
+                    <span className="hypothesis-tab-idx">#{idx + 1}</span>
+                    <span className="hypothesis-tab-name">{c.name}</span>
+                    <span className={`badge-confidence ${c.probability.toLowerCase()}`}>
+                      {c.probability}
+                    </span>
+                  </button>
+                )
+              })}
             </div>
           </div>
 
           {/* Active Evidence Dossier Document */}
-          <div className="evidence-document-card">
-            <div className="doc-meta-strip">
-              <span className="doc-tag">SYSTEM: {activeCause.systemCategory.toUpperCase()}</span>
-              <span className="doc-tag">ID: {activeCause.id}</span>
-              <span className={`doc-tag prob ${activeCause.probability.toLowerCase()}`}>
-                CONFIDENCE: {activeCause.probability.toUpperCase()}
-              </span>
+          <div className="evidence-dossier-card">
+            {/* Top metadata row */}
+            <div className="dossier-meta-row">
+              <div className="dossier-tags">
+                <span className="badge-system">{activeCause.systemCategory} Subsystem</span>
+                <span className={`badge-confidence ${activeCause.probability.toLowerCase()}`}>
+                  Confidence: {activeCause.probability}
+                </span>
+              </div>
+              <span className="dossier-id-tag">ID: {activeCause.id}</span>
             </div>
 
-            <div className="doc-title-row">
-              <h3 className="doc-main-heading">{activeCause.name}</h3>
-            </div>
+            <h2 className="dossier-cause-title">{activeCause.name}</h2>
 
-            <div className="doc-callout-note">
-              <span className="callout-header">// MECHATRONIC ENGINEERING RATIONALE:</span>
-              <p className="callout-body">{activeCause.reasoning}</p>
+            {/* Engineering Rationale Callout */}
+            <div className="rationale-callout">
+              <div className="rationale-header">
+                <Sparkles size={16} className="text-amber" />
+                <span>Mechatronic Engineering Rationale</span>
+              </div>
+              <p className="rationale-body">{activeCause.reasoning}</p>
             </div>
 
             {/* 4-Quadrant Evidence Matrix */}
             <div className="evidence-matrix-grid">
-              {/* [+] Supporting Evidence */}
-              <div className="matrix-card supporting">
-                <div className="matrix-card-header">
-                  <span className="matrix-icon">[+]</span>
-                  <h4>SUPPORTING EVIDENCE</h4>
+              {/* Supporting Evidence */}
+              <div className="matrix-quadrant supporting">
+                <div className="quadrant-header">
+                  <div className="quadrant-icon supporting">
+                    <CheckCircle2 size={16} />
+                  </div>
+                  <div>
+                    <h4>Supporting Observations</h4>
+                    <span className="quadrant-desc">Evidence validating this hypothesis</span>
+                  </div>
                 </div>
-                <p className="matrix-desc">Observations directly validating this hypothesis:</p>
-                <ul>
+                <ul className="quadrant-list">
                   {activeCause.evidence.supporting.map((item, idx) => (
                     <li key={idx}>
-                      <span className="list-marker">+</span>
+                      <CheckCircle2 size={14} className="list-icon supporting" />
                       <span>{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              {/* [-] Contradicting Evidence */}
-              <div className="matrix-card contradicting">
-                <div className="matrix-card-header">
-                  <span className="matrix-icon">[-]</span>
-                  <h4>CONTRADICTING / WEAKENING EVIDENCE</h4>
+              {/* Contradicting Evidence */}
+              <div className="matrix-quadrant contradicting">
+                <div className="quadrant-header">
+                  <div className="quadrant-icon contradicting">
+                    <XCircle size={16} />
+                  </div>
+                  <div>
+                    <h4>Contradicting / Weakening</h4>
+                    <span className="quadrant-desc">Factors suggesting an alternate fault</span>
+                  </div>
                 </div>
-                <p className="matrix-desc">Factors suggesting an alternate failure mode:</p>
-                <ul>
+                <ul className="quadrant-list">
                   {activeCause.evidence.contradicting.length > 0 ? (
                     activeCause.evidence.contradicting.map((item, idx) => (
                       <li key={idx}>
-                        <span className="list-marker">-</span>
+                        <XCircle size={14} className="list-icon contradicting" />
                         <span>{item}</span>
                       </li>
                     ))
                   ) : (
                     <li className="dim-row">
-                      <span className="list-marker">•</span>
+                      <span className="dim-bullet">•</span>
                       <span>No contradicting evidence identified for this symptom profile.</span>
                     </li>
                   )}
                 </ul>
               </div>
 
-              {/* [?] Missing Telemetry */}
-              <div className="matrix-card missing">
-                <div className="matrix-card-header">
-                  <span className="matrix-icon">[?]</span>
-                  <h4>UNCONFIRMED / MISSING TELEMETRY</h4>
+              {/* Missing Telemetry */}
+              <div className="matrix-quadrant missing">
+                <div className="quadrant-header">
+                  <div className="quadrant-icon missing">
+                    <HelpCircle size={16} />
+                  </div>
+                  <div>
+                    <h4>Unconfirmed Telemetry</h4>
+                    <span className="quadrant-desc">Missing data to confirm diagnosis</span>
+                  </div>
                 </div>
-                <p className="matrix-desc">Data points needed to convert hypothesis to confirmed diagnosis:</p>
-                <ul>
+                <ul className="quadrant-list">
                   {activeCause.evidence.missingInfo.map((item, idx) => (
                     <li key={idx}>
-                      <span className="list-marker">?</span>
+                      <HelpCircle size={14} className="list-icon missing" />
                       <span>{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              {/* [!] Discriminating Verification Test */}
-              <div className="matrix-card test">
-                <div className="matrix-card-header">
-                  <span className="matrix-icon">[!]</span>
-                  <h4>DISCRIMINATING VERIFICATION TEST</h4>
+              {/* Discriminating Test */}
+              <div className="matrix-quadrant test">
+                <div className="quadrant-header">
+                  <div className="quadrant-icon test">
+                    <Zap size={16} />
+                  </div>
+                  <div>
+                    <h4>Discriminating Test</h4>
+                    <span className="quadrant-desc">Crucial test before parts replacement</span>
+                  </div>
                 </div>
-                <p className="matrix-desc">Perform this test before replacing parts:</p>
-                <div className="test-action-box">
+                <div className="discriminating-test-box">
                   <code>{activeCause.evidence.discriminatingTest}</code>
                 </div>
               </div>
             </div>
 
-            {/* Technical Verification Protocol */}
-            <div className="inspection-protocol-split">
-              <div className="protocol-block user">
-                <div className="protocol-header">
-                  <span className="protocol-tag">[USER_INSPECTION]</span>
-                  <h4>Safe DIY Visual Check (No Tools Required)</h4>
+            {/* Inspection Protocols */}
+            <div className="protocol-split-grid">
+              <div className="protocol-card diy">
+                <div className="protocol-badge">
+                  <ShieldCheck size={14} />
+                  <span>Safe DIY Visual Inspection (No Tools)</span>
                 </div>
-                <p className="protocol-body">{activeCause.safeUserInspection}</p>
+                <p className="protocol-content">{activeCause.safeUserInspection}</p>
               </div>
 
-              <div className="protocol-block workshop">
-                <div className="protocol-header">
-                  <span className="protocol-tag">[WORKSHOP_SPEC]</span>
-                  <h4>Certified Technician Procedure</h4>
+              <div className="protocol-card workshop">
+                <div className="protocol-badge workshop">
+                  <Wrench size={14} />
+                  <span>Certified Technician Procedure</span>
                 </div>
-                <ol className="protocol-steps-list">
+                <ol className="protocol-steps">
                   {activeCause.professionalMechanicSteps.map((step, idx) => (
                     <li key={idx}>
-                      <span className="step-idx">{idx + 1}.</span>
-                      <span>{step}</span>
+                      <span className="step-counter">{idx + 1}</span>
+                      <span className="step-text">{step}</span>
                     </li>
                   ))}
                 </ol>

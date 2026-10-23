@@ -1,5 +1,18 @@
 import React, { useState } from 'react'
 import { exportAllUserData, importUserData, clearStorageForTesting } from '../services/storageService'
+import {
+  Database,
+  ShieldCheck,
+  Download,
+  Trash2,
+  CheckCircle2,
+  AlertTriangle,
+  FileJson,
+  Zap,
+  Lock,
+  RefreshCw,
+  ServerOff
+} from 'lucide-react'
 
 interface SettingsViewProps {
   onDataReset: () => void
@@ -21,7 +34,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onDataReset }) => {
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
-      setFeedback({ type: 'success', message: 'Vault exported to JSON backup successfully.' })
+      setFeedback({ type: 'success', message: 'Vault exported to portable JSON backup successfully.' })
     } catch (err: any) {
       setFeedback({ type: 'error', message: `Export error: ${err?.message || err}` })
     }
@@ -29,7 +42,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onDataReset }) => {
 
   const handleImport = () => {
     if (!importJsonText.trim()) {
-      setFeedback({ type: 'error', message: 'Paste valid JSON data into the field before importing.' })
+      setFeedback({ type: 'error', message: 'Please paste valid JSON data before attempting import.' })
       return
     }
     const result = importUserData(importJsonText)
@@ -43,119 +56,159 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onDataReset }) => {
   }
 
   const handleClearAll = () => {
-    if (confirm('Are you sure you want to delete all saved vehicles, diagnostic reports, and service records? This cannot be undone.')) {
+    if (confirm('Are you sure you want to permanently erase all saved vehicles, diagnostic reports, and service logs? This cannot be undone.')) {
       clearStorageForTesting()
       onDataReset()
-      setFeedback({ type: 'success', message: 'Local storage vault wiped.' })
+      setFeedback({ type: 'success', message: 'Local storage vault wiped clean.' })
     }
   }
 
   return (
-    <div className="view-container note-page-layout">
-      {/* Dossier Header */}
-      <div className="note-dossier-header">
-        <div className="dossier-meta-strip">
-          <span className="mono-badge">SPEC // SYSTEM_VAULT</span>
-          <span className="meta-divider">/</span>
-          <span className="mono-text">PRIVACY: LOCAL_FIRST</span>
-          <span className="meta-divider">/</span>
-          <span className="mono-text">OP_COST: $0.00_PER_MONTH</span>
+    <div className="view-container">
+      {/* View Header */}
+      <div className="view-header">
+        <div className="view-meta-pill">
+          <Database className="meta-icon" size={13} />
+          <span>System Vault & Privacy Architecture</span>
+          <span className="meta-dot">•</span>
+          <span>Zero-Cost Infrastructure</span>
         </div>
 
-        <div className="dossier-title-group">
-          <h2 className="dossier-title">System Architecture, Privacy Vault & Backup</h2>
-          <p className="dossier-sub">
-            Review MechMate's zero-cost engineering architecture, export offline JSON diagnostic records,
-            and audit local-first security guarantees.
-          </p>
-        </div>
+        <h1 className="view-title">Vault & Architecture</h1>
+        <p className="view-subtitle">
+          Audit MechMate's local-first privacy guarantees, zero cloud database footprint,
+          and manage your portable JSON diagnostic backups.
+        </p>
       </div>
 
       {feedback && (
-        <div className={`feedback-callout ${feedback.type}`}>
-          <span className="callout-symbol">{feedback.type === 'success' ? '✓' : '⚠️'}</span>
+        <div className={`feedback-alert ${feedback.type}`}>
+          {feedback.type === 'success' ? (
+            <CheckCircle2 size={18} className="text-success" />
+          ) : (
+            <AlertTriangle size={18} className="text-danger" />
+          )}
           <span>{feedback.message}</span>
         </div>
       )}
 
-      <div className="vault-sections-grid">
-        {/* Privacy Manifesto */}
-        <div className="note-card vault-card">
-          <div className="card-section-header">
-            <span className="section-index">01</span>
+      <div className="vault-grid">
+        {/* Privacy Architecture Card */}
+        <div className="vault-card">
+          <div className="vault-card-header">
+            <div className="vault-card-icon">
+              <Lock size={18} className="text-amber" />
+            </div>
             <div>
-              <h3>Privacy Architecture & Data Sovereignty</h3>
-              <p className="section-desc">Zero telemetry, zero user tracking, client-encrypted local storage</p>
+              <h3>Local-First Data Sovereignty</h3>
+              <p className="vault-card-desc">Zero telemetry, zero cross-site tracking, client-encrypted storage</p>
             </div>
           </div>
-          <p className="vault-p">
+
+          <p className="vault-text">
             MechMate is engineered with a strict <strong>local-first privacy architecture</strong>.
-            Your vehicles, odometer readings, maintenance histories, and diagnostic inquiries are stored
-            strictly on your client device using browser storage.
+            Your vehicles, odometer readings, maintenance histories, and diagnostic consultations are persisted
+            strictly on your local device.
           </p>
-          <ul className="spec-bullet-list">
-            <li><span className="check">[✓]</span> <strong>Zero Cloud Database Dependencies</strong>: No remote databases holding user vehicle logs or VINs.</li>
-            <li><span className="check">[✓]</span> <strong>No Trackers or Marketing Cookies</strong>: Completely clean, zero-analytics client runtime.</li>
-            <li><span className="check">[✓]</span> <strong>Stateless Serverless Proxy</strong>: <code>/api/diagnose</code> passes zero persistent user identifiers.</li>
-            <li><span className="check">[✓]</span> <strong>100% Offline Resilience</strong>: Built-in deterministic mechatronics engine operates with zero network access.</li>
+
+          <ul className="vault-features-list">
+            <li>
+              <CheckCircle2 size={15} className="text-success" />
+              <span><strong>Zero Cloud Database Dependencies:</strong> No remote databases storing user VINs or logs.</span>
+            </li>
+            <li>
+              <CheckCircle2 size={15} className="text-success" />
+              <span><strong>No Marketing Cookies:</strong> 100% clean runtime with zero ad networks or analytics beacons.</span>
+            </li>
+            <li>
+              <CheckCircle2 size={15} className="text-success" />
+              <span><strong>Stateless Serverless Proxy:</strong> Backend AI passes zero persistent user identifiers.</span>
+            </li>
+            <li>
+              <CheckCircle2 size={15} className="text-success" />
+              <span><strong>Offline Capable:</strong> Deterministic diagnostic engine operates without network connection.</span>
+            </li>
           </ul>
         </div>
 
-        {/* Operating Cost Economics */}
-        <div className="note-card vault-card">
-          <div className="card-section-header">
-            <span className="section-index">02</span>
+        {/* Operating Cost Economics Card */}
+        <div className="vault-card">
+          <div className="vault-card-header">
+            <div className="vault-card-icon">
+              <Zap size={18} className="text-amber" />
+            </div>
             <div>
-              <h3>Free-First Operating Model</h3>
-              <p className="section-desc">Sustainable zero-cost economics for independent builder products</p>
+              <h3>Free-First Operating Economics</h3>
+              <p className="vault-card-desc">Sustainable zero-cost design for indie builder applications</p>
             </div>
           </div>
-          <p className="vault-p">
+
+          <p className="vault-text">
             Designed to demonstrate sustainable software engineering with zero mandatory monthly operational subscriptions:
           </p>
-          <ul className="spec-bullet-list">
-            <li><span className="tag">[DETERMINISTIC_ENGINE]</span> 0 API calls, 0 cost, instant offline evaluation.</li>
-            <li><span className="tag">[VERCEL_SERVERLESS]</span> Operates entirely within Vercel's generous free tier.</li>
-            <li><span className="tag">[GEMINI_FREE_TIER]</span> Optional cloud AI uses standard free quota with rate guards.</li>
-            <li><span className="tag">[CLIENT_STORAGE]</span> LocalStorage eliminates monthly managed database hosting fees.</li>
+
+          <ul className="vault-features-list">
+            <li>
+              <ServerOff size={15} className="text-amber" />
+              <span><strong>Deterministic Engine:</strong> Instant local evaluation with 0 API calls and $0.00 compute expense.</span>
+            </li>
+            <li>
+              <ShieldCheck size={15} className="text-amber" />
+              <span><strong>Vercel Edge Network:</strong> Hosted entirely within generous standard free tiers.</span>
+            </li>
+            <li>
+              <RefreshCw size={15} className="text-amber" />
+              <span><strong>Gemini Cloud Tier:</strong> Free quota with client-side rate dampening and fallback safety net.</span>
+            </li>
+            <li>
+              <Database size={15} className="text-amber" />
+              <span><strong>LocalStorage Vault:</strong> Avoids expensive managed database hosting fees.</span>
+            </li>
           </ul>
         </div>
 
-        {/* Backup, Export & Restore Vault */}
-        <div className="note-card vault-card full-width">
-          <div className="card-section-header">
-            <span className="section-index">03</span>
+        {/* Data Vault: Export & Import */}
+        <div className="vault-card full-width">
+          <div className="vault-card-header">
+            <div className="vault-card-icon">
+              <FileJson size={18} className="text-amber" />
+            </div>
             <div>
-              <h3>Data Vault: Export & Import</h3>
-              <p className="section-desc">Export your entire garage manifest, service milestones, and diagnostic ledgers as standard portable JSON</p>
+              <h3>Data Vault: Backup, Export & Restore</h3>
+              <p className="vault-card-desc">Export your fleet manifest, service milestones, and diagnostic history as standard portable JSON</p>
             </div>
           </div>
 
-          <div className="vault-actions-strip">
-            <button className="coded-primary-btn" onClick={handleExport}>
-              📥 EXPORT_VAULT_BACKUP [.JSON]
+          <div className="vault-actions-bar">
+            <button className="btn-primary" onClick={handleExport}>
+              <Download size={16} />
+              <span>Export Vault Backup (.JSON)</span>
             </button>
-            <button className="coded-danger-btn" onClick={handleClearAll}>
-              🗑️ WIPE_LOCAL_STORAGE
+            <button className="btn-danger" onClick={handleClearAll}>
+              <Trash2 size={16} />
+              <span>Wipe Local Storage</span>
             </button>
           </div>
 
-          <div className="vault-import-box">
-            <span className="import-box-label">// RESTORE_FROM_RAW_JSON_BACKUP:</span>
+          <div className="restore-box">
+            <label className="restore-label">
+              <span>Restore from Raw JSON Backup</span>
+            </label>
             <textarea
-              className="vault-textarea"
+              className="restore-textarea"
               placeholder="Paste exported MechMate JSON backup here..."
               rows={4}
               value={importJsonText}
               onChange={e => setImportJsonText(e.target.value)}
             />
-            <div className="import-actions">
+            <div className="restore-submit-row">
               <button
-                className="coded-secondary-btn"
+                className="btn-secondary"
                 onClick={handleImport}
                 disabled={!importJsonText.trim()}
               >
-                APPLY_JSON_RESTORE ↵
+                <RefreshCw size={14} />
+                <span>Apply JSON Restore</span>
               </button>
             </div>
           </div>
