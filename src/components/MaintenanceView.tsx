@@ -25,16 +25,16 @@ export const MaintenanceView: React.FC<MaintenanceViewProps> = ({
 
   if (!activeVehicle) {
     return (
-      <div className="view-container">
-        <div className="empty-card">
-          <div className="empty-icon">🛠️</div>
-          <h3>Select or Add a Vehicle First</h3>
+      <div className="view-container note-page-layout">
+        <div className="note-empty-card">
+          <span className="empty-symbol">[!]</span>
+          <h3>Vehicle Target Unassigned</h3>
           <p>
-            Maintenance schedules require vehicle mileage, engine type, and transmission specifications.
-            Add a car to your garage to access customized service tracking.
+            Maintenance schedules calculate interval wear from vehicle fuel type, transmission, and odometer readings.
+            Select an active car from your garage to access calibrated service timelines.
           </p>
-          <button className="primary-btn" onClick={onOpenGarage}>
-            🚗 Open Vehicle Garage
+          <button className="coded-primary-btn" onClick={onOpenGarage}>
+            OPEN_GARAGE_REGISTRY ↵
           </button>
         </div>
       </div>
@@ -52,7 +52,6 @@ export const MaintenanceView: React.FC<MaintenanceViewProps> = ({
   const handleConfirmCompletion = () => {
     if (completeModalItemId) {
       onMarkCompleted(completeModalItemId, completeKm, completeDate)
-      // Update vehicle odometer if completed at higher mileage
       if (completeKm > activeVehicle.odometerKm) {
         onUpdateVehicleOdometer(activeVehicle.id, completeKm)
       }
@@ -61,82 +60,96 @@ export const MaintenanceView: React.FC<MaintenanceViewProps> = ({
   }
 
   return (
-    <div className="view-container">
-      <div className="view-header">
-        <div className="view-title">
-          <div className="view-badge">SERVICE & PREVENTATIVE MAINTENANCE</div>
-          <h2>Maintenance Intelligence Planner</h2>
-          <p>
-            Mileage-calibrated service schedules for {activeVehicle.year} {activeVehicle.make} {activeVehicle.model}.
-            Tailored to Indian road and climate conditions.
+    <div className="view-container note-page-layout">
+      {/* Dossier Header */}
+      <div className="note-dossier-header">
+        <div className="dossier-meta-strip">
+          <span className="mono-badge">LOG // SERVICE_PLANNER</span>
+          <span className="meta-divider">/</span>
+          <span className="mono-text">SPEC: INDIAN_TROPICAL_MAINTENANCE</span>
+          <span className="meta-divider">/</span>
+          <span className="mono-text">CYCLE: 10,000KM_STANDARD</span>
+        </div>
+
+        <div className="dossier-title-group">
+          <h2 className="dossier-title">Preventative Service Ledger</h2>
+          <p className="dossier-sub">
+            Calibrated maintenance milestones for {activeVehicle.year} {activeVehicle.make} {activeVehicle.model} ({activeVehicle.odometerKm.toLocaleString('en-IN')} km).
+            Adapted for Indian dust, urban stop-and-go traffic, and tropical humidity.
           </p>
         </div>
       </div>
 
-      {/* Maintenance Stats Bar */}
-      <div className="maint-stats-bar">
-        <div className="maint-stat-box total">
-          <span className="stat-num">{activeVehicle.odometerKm.toLocaleString('en-IN')} km</span>
-          <span className="stat-label">Current Odometer</span>
+      {/* Coded Telemetry Stats Ribbon */}
+      <div className="coded-telemetry-ribbon">
+        <div className="telemetry-cell">
+          <span className="cell-label">CURRENT_ODOMETER</span>
+          <span className="cell-value">{activeVehicle.odometerKm.toLocaleString('en-IN')} KM</span>
         </div>
-        <div className={`maint-stat-box due ${dueCount > 0 ? 'highlight' : ''}`}>
-          <span className="stat-num">{dueCount}</span>
-          <span className="stat-label">Services Overdue</span>
+        <div className={`telemetry-cell ${dueCount > 0 ? 'critical' : ''}`}>
+          <span className="cell-label">OVERDUE_MILESTONES</span>
+          <span className="cell-value">{dueCount}</span>
         </div>
-        <div className="maint-stat-box upcoming">
-          <span className="stat-num">{upcomingCount}</span>
-          <span className="stat-label">Upcoming Soon</span>
+        <div className="telemetry-cell">
+          <span className="cell-label">UPCOMING_SOON</span>
+          <span className="cell-value">{upcomingCount}</span>
         </div>
-        <div className="maint-stat-box healthy">
-          <span className="stat-num">{healthyCount}</span>
-          <span className="stat-label">Up to Date</span>
+        <div className="telemetry-cell">
+          <span className="cell-label">VERIFIED_HEALTHY</span>
+          <span className="cell-value">{healthyCount}</span>
         </div>
       </div>
 
-      {/* Schedule Items List */}
-      <div className="maint-list">
-        {evaluatedItems.map(item => {
+      {/* Maintenance Service Cards List */}
+      <div className="service-ledger-list">
+        {evaluatedItems.map((item, idx) => {
           return (
-            <div key={item.id} className={`maint-card ${item.status.toLowerCase()}`}>
-              <div className="maint-card-left">
-                <div className="maint-category-tag">{item.systemCategory}</div>
-                <h4 className="maint-title">{item.title}</h4>
-                <p className="maint-note">{item.recommendationNote}</p>
-                <div className="maint-meta">
-                  <span>Cycle: Every {item.intervalKm.toLocaleString('en-IN')} km / {item.intervalMonths} mo</span>
+            <div key={item.id} className={`service-item-row ${item.status.toLowerCase()}`}>
+              <div className="service-row-left">
+                <div className="service-header-line">
+                  <span className="service-idx">0{idx + 1}.</span>
+                  <span className="service-sys-tag">[{item.systemCategory.toUpperCase()}]</span>
+                  <h4 className="service-title">{item.title}</h4>
+                  <span className={`service-status-pill ${item.status.toLowerCase()}`}>
+                    {item.status === 'DUE' && 'OVERDUE // IMMEDIATE'}
+                    {item.status === 'UPCOMING' && 'DUE_SOON // <2000KM'}
+                    {item.status === 'HEALTHY' && 'HEALTHY // VERIFIED'}
+                  </span>
+                </div>
+
+                <p className="service-note-text">{item.recommendationNote}</p>
+
+                <div className="service-meta-line">
+                  <span>INTERVAL: Every {item.intervalKm.toLocaleString('en-IN')} km / {item.intervalMonths} mo</span>
                   {item.lastCompletedKm !== undefined && (
-                    <span>Last done at: {item.lastCompletedKm.toLocaleString('en-IN')} km</span>
+                    <span>PREVIOUS: {item.lastCompletedKm.toLocaleString('en-IN')} km</span>
+                  )}
+                  {item.lastCompletedDate && (
+                    <span>DATE: {item.lastCompletedDate}</span>
                   )}
                 </div>
               </div>
 
-              <div className="maint-card-right">
-                <div className="maint-progress-wrap">
-                  <div className="maint-progress-bar">
+              <div className="service-row-right">
+                <div className="service-progress-container">
+                  <div className="service-meter-bar">
                     <div
-                      className={`maint-progress-fill ${item.status.toLowerCase()}`}
+                      className={`service-meter-fill ${item.status.toLowerCase()}`}
                       style={{ width: `${item.progressPercent}%` }}
                     />
                   </div>
-                  <span className="progress-text">{item.progressPercent}% interval elapsed</span>
+                  <span className="meter-label">{item.progressPercent}% INTERVAL ELAPSED</span>
                 </div>
 
-                <div className="maint-action-group">
-                  <span className={`status-pill ${item.status.toLowerCase()}`}>
-                    {item.status === 'DUE' && '⚠️ OVERDUE'}
-                    {item.status === 'UPCOMING' && '⏳ DUE SOON'}
-                    {item.status === 'HEALTHY' && '✓ HEALTHY'}
-                  </span>
-                  <button
-                    className="complete-service-btn"
-                    onClick={() => {
-                      setCompleteModalItemId(item.id)
-                      setCompleteKm(activeVehicle.odometerKm)
-                    }}
-                  >
-                    ✓ Log Service
-                  </button>
-                </div>
+                <button
+                  className="coded-log-btn"
+                  onClick={() => {
+                    setCompleteModalItemId(item.id)
+                    setCompleteKm(activeVehicle.odometerKm)
+                  }}
+                >
+                  [LOG_SERVICE ↵]
+                </button>
               </div>
             </div>
           )
@@ -146,42 +159,50 @@ export const MaintenanceView: React.FC<MaintenanceViewProps> = ({
       {/* Log Service Modal */}
       {completeModalItemId && (
         <div className="modal-overlay">
-          <div className="modal-card">
-            <div className="modal-header">
-              <h3>Log Completed Maintenance</h3>
-              <button className="modal-close-btn" onClick={() => setCompleteModalItemId(null)}>✕</button>
+          <div className="coded-modal-card">
+            <div className="modal-header-strip">
+              <span className="modal-badge">SERVICE_LOG // CONFIRMATION</span>
+              <button className="modal-x-btn" onClick={() => setCompleteModalItemId(null)}>[esc]</button>
             </div>
-            <div className="service-log-form">
-              <div className="form-group">
-                <label>Odometer at Service (km)</label>
+
+            <div className="modal-title-wrap">
+              <h3>Log Maintenance Completion</h3>
+              <p>Record service completion date and odometer to reset milestone interval:</p>
+            </div>
+
+            <div className="coded-modal-form">
+              <div className="form-field">
+                <label>ODOMETER AT SERVICE (KM) *</label>
                 <input
                   type="number"
                   value={completeKm}
                   onChange={e => setCompleteKm(parseInt(e.target.value, 10) || 0)}
                 />
               </div>
-              <div className="form-group">
-                <label>Date Completed</label>
+
+              <div className="form-field">
+                <label>DATE OF COMPLETION *</label>
                 <input
                   type="date"
                   value={completeDate}
                   onChange={e => setCompleteDate(e.target.value)}
                 />
               </div>
-              <div className="modal-actions">
+
+              <div className="modal-footer-actions">
                 <button
                   type="button"
-                  className="secondary-btn"
+                  className="coded-ghost-btn"
                   onClick={() => setCompleteModalItemId(null)}
                 >
-                  Cancel
+                  CANCEL
                 </button>
                 <button
                   type="button"
-                  className="primary-btn"
+                  className="coded-primary-btn"
                   onClick={handleConfirmCompletion}
                 >
-                  Confirm & Save Service Record
+                  COMMIT_SERVICE_LOG ↵
                 </button>
               </div>
             </div>

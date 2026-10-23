@@ -20,83 +20,93 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="header">
       <div className="header-left">
         <div className="brand" onClick={() => setActiveTab('diagnose')} style={{ cursor: 'pointer' }}>
-          <div className="logo-icon">🔧</div>
+          <div className="logo-terminal-icon">
+            <span className="terminal-prompt">$</span>
+          </div>
           <div className="header-title">
             <div className="title-row">
-              <h1>MechMate</h1>
-              <span className="platform-tag">INTELLIGENCE</span>
+              <span className="brand-name">mechmate</span>
+              <span className="dot-sep">/</span>
+              <span className="brand-sub">diag.notes</span>
+              <span className="version-pill">v2.0.0</span>
             </div>
-            <p>Automotive Diagnostic Platform</p>
+            <p className="brand-tagline">Automotive Intelligence Ledger</p>
           </div>
         </div>
 
-        {/* Active Vehicle Pill */}
+        {/* Active Vehicle Note Pill */}
         <div
-          className="vehicle-pill"
+          className="vehicle-note-chip"
           onClick={() => setActiveTab('garage')}
-          title="Click to switch vehicle"
+          title="Click to switch active vehicle profile"
         >
-          <span className="vehicle-pill-icon">🚗</span>
-          <span className="vehicle-pill-text">
+          <span className="chip-key">CAR:</span>
+          <span className="chip-value">
             {activeVehicle
               ? `${activeVehicle.year} ${activeVehicle.make} ${activeVehicle.model}`
-              : 'Generic Vehicle Mode'}
+              : 'generic_vehicle'}
           </span>
-          <span className="vehicle-pill-badge">
-            {activeVehicle ? `${activeVehicle.odometerKm.toLocaleString('en-IN')} km` : 'No Car'}
+          <span className="chip-meta">
+            {activeVehicle ? `${activeVehicle.odometerKm.toLocaleString('en-IN')}km` : 'uncalibrated'}
           </span>
         </div>
       </div>
 
       <div className="header-right">
-        {/* Navigation Tabs */}
+        {/* Navigation Tabs - Coded Note Vibe */}
         <nav className="nav-tabs" aria-label="Main Navigation">
           <button
             className={`nav-tab ${activeTab === 'diagnose' ? 'active' : ''}`}
             onClick={() => setActiveTab('diagnose')}
           >
-            ⚡ Diagnose
+            <span className="tab-idx">01</span>
+            <span className="tab-label">diagnose</span>
           </button>
           <button
             className={`nav-tab ${activeTab === 'evidence' ? 'active' : ''}`}
             onClick={() => setActiveTab('evidence')}
           >
-            🔍 Evidence
+            <span className="tab-idx">02</span>
+            <span className="tab-label">evidence</span>
           </button>
           <button
             className={`nav-tab ${activeTab === 'garage' ? 'active' : ''}`}
             onClick={() => setActiveTab('garage')}
           >
-            🚗 Garage
+            <span className="tab-idx">03</span>
+            <span className="tab-label">garage</span>
           </button>
           <button
             className={`nav-tab ${activeTab === 'maintenance' ? 'active' : ''}`}
             onClick={() => setActiveTab('maintenance')}
           >
-            🛠️ Service
+            <span className="tab-idx">04</span>
+            <span className="tab-label">service</span>
           </button>
           <button
             className={`nav-tab ${activeTab === 'obd' ? 'active' : ''}`}
             onClick={() => setActiveTab('obd')}
           >
-            📟 OBD-II
+            <span className="tab-idx">05</span>
+            <span className="tab-label">obd-ii</span>
           </button>
           <button
             className={`nav-tab ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => setActiveTab('settings')}
-            title="Settings & Privacy"
+            title="Settings, Vault & Architecture"
           >
-            ⚙️
+            <span className="tab-idx">06</span>
+            <span className="tab-label">vault</span>
           </button>
         </nav>
 
-        {/* Provider Status Indicator */}
+        {/* Engine Status Tag */}
         <div
-          className={`status-indicator ${isServerAiOnline ? 'online' : 'fallback'}`}
-          title={isServerAiOnline ? 'Server AI Active with Offline Fallback' : 'Zero-Cost Local Mechatronic Engine Active (100% Offline)'}
+          className={`status-chip ${isServerAiOnline ? 'online' : 'fallback'}`}
+          title={isServerAiOnline ? 'Server AI Active with Local Fallback' : 'Local Deterministic Mechatronic Engine Active (100% Offline)'}
         >
-          <div className="status-ping" />
-          <span>{isServerAiOnline ? 'Hybrid AI' : 'Mechatronic Engine'}</span>
+          <span className="status-dot-pulse" />
+          <span className="status-text">{isServerAiOnline ? 'HYBRID_AI' : 'OFFLINE_FIRST'}</span>
         </div>
       </div>
     </header>
