@@ -6,12 +6,14 @@ interface FooterProps {
   tokenState: TokenState
   onOpenPrivacyPolicy: () => void
   onOpenAuth: () => void
+  onOpenAdmin?: () => void
 }
 
 export const Footer: React.FC<FooterProps> = ({
   tokenState,
   onOpenPrivacyPolicy,
-  onOpenAuth
+  onOpenAuth,
+  onOpenAdmin
 }) => {
   return (
     <footer className="app-footer">
@@ -20,7 +22,6 @@ export const Footer: React.FC<FooterProps> = ({
           <div className="footer-brand-block">
             <div className="footer-logo-title">
               <span className="brand-name">MechMate</span>
-              <span className="brand-badge">PROD</span>
             </div>
             <p className="footer-tagline">
               Production Automotive Intelligence Platform. Structured mechatronic troubleshooting,
@@ -78,6 +79,19 @@ export const Footer: React.FC<FooterProps> = ({
               <span>GitHub</span>
               <ExternalLink size={11} />
             </a>
+            {onOpenAdmin && (
+              <>
+                <span className="footer-sep">•</span>
+                <button
+                  className="footer-link-btn"
+                  onClick={onOpenAdmin}
+                  style={{ opacity: 0.5, fontSize: '0.74rem' }}
+                  title="Admin passkey required"
+                >
+                  Admin Console
+                </button>
+              </>
+            )}
           </div>
 
           <div className="footer-credit">

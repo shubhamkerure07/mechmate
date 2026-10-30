@@ -1,15 +1,17 @@
 import React, { useState } from 'react'
 import {
-  User,
-  Zap,
-  CheckCircle2,
   X,
   Mail,
+  Lock,
+  User,
+  ArrowRight,
   ShieldCheck,
-  LogOut,
-  Sparkles
+  Zap,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react'
 import { TokenState, signInCustomer, signOutCustomer } from '../services/tokenService'
+import { ZarionButton } from './common/ZarionButton'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -26,33 +28,45 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onTokenStateChange,
   onOpenPrivacyPolicy
 }) => {
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [name, setName] = useState('')
-  const [agreedToPolicy, setAgreedToPolicy] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
   if (!isOpen) return null
 
   const isAlreadySignedIn = tokenState.tier === 'REGISTERED' && tokenState.user
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setErrorMsg('')
+
     if (!email.trim() || !email.includes('@')) {
       setErrorMsg('Please enter a valid email address.')
       return
     }
-    if (!agreedToPolicy) {
-      setErrorMsg('Please accept the Privacy Policy & Token Terms to proceed.')
+
+    if (password.length < 6) {
+      setErrorMsg('Password must be at least 6 characters.')
       return
     }
 
-    const res = signInCustomer(email, name)
-    if (res.success) {
-      onTokenStateChange(res.state)
-      setErrorMsg('')
-      onClose()
-    } else {
-      setErrorMsg('Unable to sign in. Please verify your email format.')
+    setIsLoading(true)
+
+    try {
+      const res = signInCustomer(email, name || undefined)
+      if (res.success) {
+        onTokenStateChange(res.state)
+        onClose()
+      } else {
+        setErrorMsg('Authentication failed. Please verify credentials.')
+      }
+    } catch {
+      setErrorMsg('Network error. Please try again.')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -67,45 +81,47 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       <div className="modal-card auth-modal-card" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <div className="modal-title-group">
-            <Zap className="text-amber" size={22} />
+            <div className="auth-brand-badge">
+              <Zap size={18} className="text-blue" />
+            </div>
             <div>
-              <h3>
+              <h3 className="auth-title">
                 {isAlreadySignedIn
-                  ? 'Customer Account & Quota'
-                  : 'Upgrade Daily Diagnostic Tokens'}
+                  ? 'Account Overview'
+                  : mode === 'signin'
+                  ? 'Sign In to MechMate'
+                  : 'Create Driver Account'}
               </h3>
-              <span className="auth-sub-badge">
+              <p className="auth-subtitle">
                 {isAlreadySignedIn
-                  ? 'Active Customer Tier: 25 Tokens/Day'
-                  : 'Free Customer Sign-In Policy'}
-              </span>
+                  ? '25 Daily Diagnostic Tokens Unlocked'
+                  : 'Unlock 25 free daily diagnostic consultations'}
+              </p>
             </div>
           </div>
-          <button className="btn-icon" onClick={onClose}>
+          <button className="btn-icon" onClick={onClose} aria-label="Close dialog">
             <X size={18} />
           </button>
         </div>
 
         {isAlreadySignedIn ? (
-          /* Signed In View */
           <div className="auth-profile-view">
             <div className="profile-identity-card">
               <div className="profile-avatar">
-                <User size={24} />
+                <User size={22} />
               </div>
-              <div>
+              <div className="profile-meta">
                 <h4 className="profile-name">{tokenState.user?.name}</h4>
                 <span className="profile-email">{tokenState.user?.email}</span>
                 <span className="profile-tier-tag">REGISTERED CUSTOMER</span>
               </div>
             </div>
 
-            {/* Token Quota Progress */}
             <div className="quota-status-card">
               <div className="quota-row">
-                <span className="quota-label">Daily Diagnostic Allowance:</span>
+                <span className="quota-label">Daily Diagnostic Tokens</span>
                 <span className="quota-value">
-                  <strong>{tokenState.remainingTokens}</strong> / {tokenState.maxTokens} remaining
+                  <strong>{tokenState.remainingTokens}</strong> / {tokenState.maxTokens}
                 </span>
               </div>
               <div className="progress-bar-bg">
@@ -117,23 +133,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 />
               </div>
               <span className="quota-reset-note">
-                ⚡ Quota resets automatically at 00:00 (Midnight) local time.
+                ⚡ Resets automatically every 24 hours at 00:00 local time.
               </span>
-            </div>
-
-            <div className="customer-benefits-list">
-              <div className="benefit-item">
-                <CheckCircle2 size={16} className="text-success" />
-                <span>25 comprehensive AI diagnostic consultations every day.</span>
-              </div>
-              <div className="benefit-item">
-                <CheckCircle2 size={16} className="text-success" />
-                <span>Zero-database local vault security for your vehicle data.</span>
-              </div>
-              <div className="benefit-item">
-                <CheckCircle2 size={16} className="text-success" />
-                <span>100% free forever — no subscriptions or credit cards required.</span>
-              </div>
             </div>
 
             <div className="auth-footer-actions">
@@ -146,100 +147,129 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 }}
               >
                 <ShieldCheck size={14} />
-                <span>Review Privacy Policy</span>
+                <span>Privacy & Token Policy</span>
               </button>
-
-              <button className="btn-danger small" onClick={handleSignOut}>
-                <LogOut size={14} />
-                <span>Sign Out (Revert to 5/day)</span>
-              </button>
+              <ZarionButton
+                variant="danger"
+                size="sm"
+                onClick={handleSignOut}
+                showArrow={false}
+              >
+                Sign Out
+              </ZarionButton>
             </div>
           </div>
         ) : (
-          /* Sign In Form to unlock 25 tokens/day */
-          <form onSubmit={handleSignIn} className="auth-signin-form">
-            <div className="tier-comparison-banner">
-              <div className="tier-col current">
-                <span className="tier-tag">CURRENT TIER</span>
-                <span className="tier-name">Anonymous</span>
-                <span className="tier-tokens">5 Tokens / Day</span>
-              </div>
-              <div className="tier-arrow">➔</div>
-              <div className="tier-col upgraded">
-                <span className="tier-tag upgraded">CUSTOMER TIER</span>
-                <span className="tier-name">Registered</span>
-                <span className="tier-tokens upgraded">25 Tokens / Day</span>
-              </div>
-            </div>
-
-            <p className="auth-form-description">
-              Sign in with your email to unlock <strong>25 daily diagnostic consultations</strong>.
-              We never spam, never sell your data, and operate strictly under our zero-tracker privacy policy.
-            </p>
-
-            {errorMsg && <div className="form-error-banner">{errorMsg}</div>}
-
-            <div className="form-group">
-              <label>Your Email Address *</label>
-              <div className="input-with-icon">
-                <Mail size={16} className="input-icon" />
-                <input
-                  type="email"
-                  placeholder="driver@example.com"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  required
-                  autoFocus
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label>Your Name / Driver Handle (Optional)</label>
-              <div className="input-with-icon">
-                <User size={16} className="input-icon" />
-                <input
-                  type="text"
-                  placeholder="e.g. Alex Kerure"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="privacy-checkbox-row">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={agreedToPolicy}
-                  onChange={e => setAgreedToPolicy(e.target.checked)}
-                />
-                <span>
-                  I understand and accept the{' '}
-                  <button
-                    type="button"
-                    className="inline-policy-link"
-                    onClick={e => {
-                      e.preventDefault()
-                      onOpenPrivacyPolicy()
-                    }}
-                  >
-                    Privacy Policy & Daily Token Terms
-                  </button>
-                </span>
-              </label>
-            </div>
-
-            <div className="modal-actions">
-              <button type="button" className="btn-secondary" onClick={onClose}>
-                Cancel
+          <div className="auth-flow-container">
+            <div className="auth-tabs-row">
+              <button
+                type="button"
+                className={`auth-tab-btn ${mode === 'signin' ? 'active' : ''}`}
+                onClick={() => {
+                  setMode('signin')
+                  setErrorMsg('')
+                }}
+              >
+                Sign In
               </button>
-              <button type="submit" className="btn-primary">
-                <Sparkles size={16} />
-                <span>Unlock 25 Free Daily Tokens</span>
+              <button
+                type="button"
+                className={`auth-tab-btn ${mode === 'signup' ? 'active' : ''}`}
+                onClick={() => {
+                  setMode('signup')
+                  setErrorMsg('')
+                }}
+              >
+                Create Account
               </button>
             </div>
-          </form>
+
+            {errorMsg && (
+              <div className="auth-error-banner">
+                <AlertCircle size={16} />
+                <span>{errorMsg}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="auth-form-body">
+              {mode === 'signup' && (
+                <div className="form-group">
+                  <label>Full Name</label>
+                  <div className="input-with-icon">
+                    <User size={16} className="input-icon" />
+                    <input
+                      type="text"
+                      placeholder="e.g. Shubham Kerure"
+                      value={name}
+                      onChange={e => setName(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="form-group">
+                <label>Email Address</label>
+                <div className="input-with-icon">
+                  <Mail size={16} className="input-icon" />
+                  <input
+                    type="email"
+                    placeholder="driver@example.com"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Password</label>
+                <div className="input-with-icon">
+                  <Lock size={16} className="input-icon" />
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="auth-perks-box">
+                <div className="perk-row">
+                  <CheckCircle2 size={14} className="text-success" />
+                  <span>25 free AI diagnoses / day (vs 5 anonymous)</span>
+                </div>
+                <div className="perk-row">
+                  <CheckCircle2 size={14} className="text-success" />
+                  <span>Zero trackers, zero database, 100% private</span>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <ZarionButton
+                  type="button"
+                  variant="secondary"
+                  onClick={onClose}
+                  showArrow={false}
+                >
+                  Cancel
+                </ZarionButton>
+                <ZarionButton
+                  type="submit"
+                  variant="blue"
+                  disabled={isLoading}
+                  icon={<ArrowRight size={16} />}
+                >
+                  {isLoading
+                    ? 'Authenticating...'
+                    : mode === 'signin'
+                    ? 'Sign In to Account'
+                    : 'Create Free Account'}
+                </ZarionButton>
+              </div>
+            </form>
+          </div>
         )}
       </div>
     </div>

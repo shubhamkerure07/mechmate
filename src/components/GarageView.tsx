@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { FuelType, TransmissionType, VehicleProfile } from '../types/automotive'
+import { ZarionButton } from './common/ZarionButton'
 import {
   Car,
   Plus,
@@ -108,10 +109,9 @@ export const GarageView: React.FC<GarageViewProps> = ({
           </p>
         </div>
 
-        <button className="btn-primary" onClick={() => setShowAddModal(true)}>
-          <Plus size={16} />
-          <span>Add Vehicle</span>
-        </button>
+        <ZarionButton variant="blue" onClick={() => setShowAddModal(true)} icon={<Plus size={16} />}>
+          Add Vehicle
+        </ZarionButton>
       </div>
 
       {vehicles.length === 0 ? (
@@ -125,13 +125,12 @@ export const GarageView: React.FC<GarageViewProps> = ({
             and personalize diagnostic workflows.
           </p>
           <div className="empty-actions-row">
-            <button className="btn-primary" onClick={() => setShowAddModal(true)}>
-              <Plus size={16} />
-              <span>Enroll First Vehicle</span>
-            </button>
-            <button className="btn-secondary" onClick={onStartDiagnosis}>
-              <span>Run Generic Diagnosis</span>
-            </button>
+            <ZarionButton variant="blue" onClick={() => setShowAddModal(true)} icon={<Plus size={16} />}>
+              Enroll First Vehicle
+            </ZarionButton>
+            <ZarionButton variant="secondary" onClick={onStartDiagnosis} showArrow={false}>
+              Run Generic Diagnosis
+            </ZarionButton>
           </div>
         </div>
       ) : (
@@ -366,17 +365,17 @@ export const GarageView: React.FC<GarageViewProps> = ({
               </div>
 
               <div className="modal-actions">
-                <button
+                <ZarionButton
                   type="button"
-                  className="btn-secondary"
+                  variant="secondary"
                   onClick={() => setShowAddModal(false)}
+                  showArrow={false}
                 >
                   Cancel
-                </button>
-                <button type="submit" className="btn-primary">
-                  <ShieldCheck size={16} />
-                  <span>Save Vehicle</span>
-                </button>
+                </ZarionButton>
+                <ZarionButton type="submit" variant="blue" icon={<ShieldCheck size={16} />}>
+                  Save Vehicle
+                </ZarionButton>
               </div>
             </form>
           </div>

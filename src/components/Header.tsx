@@ -11,7 +11,8 @@ import {
   Sparkles,
   Zap,
   User,
-  Sliders
+  Sun,
+  Moon
 } from 'lucide-react'
 import { VehicleProfile } from '../types/automotive'
 import { TokenState } from '../services/tokenService'
@@ -25,6 +26,8 @@ interface HeaderProps {
   isServerAiOnline: boolean
   tokenState: TokenState
   onOpenAuth: () => void
+  theme: 'light' | 'dark'
+  onToggleTheme: () => void
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -33,7 +36,9 @@ export const Header: React.FC<HeaderProps> = ({
   activeVehicle,
   isServerAiOnline,
   tokenState,
-  onOpenAuth
+  onOpenAuth,
+  theme,
+  onToggleTheme
 }) => {
   return (
     <>
@@ -52,9 +57,8 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="brand-text">
                 <div className="brand-title-row">
                   <span className="brand-name">MECHMATE</span>
-                  <span className="brand-badge">SWISS // SPEC</span>
                 </div>
-                <span className="brand-tagline">Automotive Intelligence Instrument</span>
+                <span className="brand-tagline">Personal Automotive AI Manager</span>
               </div>
             </div>
 
@@ -126,18 +130,20 @@ export const Header: React.FC<HeaderProps> = ({
               <Database size={15} />
               <span>Vault</span>
             </button>
-            <button
-              className={`nav-btn ${activeTab === 'admin' ? 'active' : ''}`}
-              onClick={() => setActiveTab('admin')}
-              title="Administrator Command Console"
-            >
-              <Sliders size={15} />
-              <span>Admin</span>
-            </button>
           </nav>
 
           {/* Right Actions: Token Quota & Account */}
           <div className="header-right-actions">
+            {/* Theme Toggle Button (Light/Dark Mode) */}
+            <button
+              className="header-theme-toggle"
+              onClick={onToggleTheme}
+              title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
+              aria-label="Toggle visual theme"
+            >
+              {theme === 'light' ? <Moon size={15} /> : <Sun size={15} />}
+            </button>
+
             {/* Daily Token Quota Pill */}
             <button
               className="header-token-badge"
@@ -222,13 +228,6 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <Cpu size={17} />
           <span>OBD-II</span>
-        </button>
-        <button
-          className={`mobile-nav-item ${activeTab === 'admin' ? 'active' : ''}`}
-          onClick={() => setActiveTab('admin')}
-        >
-          <Sliders size={17} />
-          <span>Admin</span>
         </button>
       </nav>
     </>

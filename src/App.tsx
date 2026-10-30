@@ -43,6 +43,26 @@ export default function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false)
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState<boolean>(false)
 
+  // Visual Theme (Default Start: Light / White)
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('mechmate_theme')
+      if (saved === 'dark' || saved === 'light') return saved
+    }
+    return 'light' // Always first start with white
+  })
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    try {
+      localStorage.setItem('mechmate_theme', theme)
+    } catch {}
+  }, [theme])
+
+  const handleToggleTheme = () => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'))
+  }
+
   // Initialize data from local storage
   const loadStateFromStorage = () => {
     const loadedVehicles = getStoredVehicles()
@@ -164,6 +184,8 @@ export default function App() {
         isServerAiOnline={isServerAiOnline}
         tokenState={tokenState}
         onOpenAuth={() => setIsAuthModalOpen(true)}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
 
       <main className="main-content" role="main">
@@ -232,6 +254,7 @@ export default function App() {
         tokenState={tokenState}
         onOpenPrivacyPolicy={() => setIsPrivacyModalOpen(true)}
         onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenAdmin={() => setActiveTab('admin')}
       />
 
       {/* Customer Sign-In / Token Modal */}

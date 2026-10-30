@@ -59,7 +59,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
       setAuthError('')
       setPasskeyInput('')
     } else {
-      setAuthError('Invalid Admin Passkey. Hint: mechmate-admin')
+      setAuthError('Invalid administrator passkey. Access denied.')
     }
   }
 
@@ -132,7 +132,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
                   autoFocus
                 />
               </div>
-              <span className="form-hint">Default Access Key: <code>mechmate-admin</code></span>
+              <span className="form-hint">Authorized system administrators only.</span>
             </div>
 
             <button type="submit" className="btn-primary full-width">
